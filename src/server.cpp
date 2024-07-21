@@ -1,18 +1,25 @@
 // socket = interface de commmunication entre 2 machine sur un réseau
 // un socket comprend: une adresse ip, un port,un protocole
 
-#include <iostream>       // Inclusion de la bibliothèque standard d'entrée/sortie
-#include <unistd.h>       // Inclusion des définitions de fonctions POSIX (par exemple, close())
-#include <netinet/in.h>   // Inclusion des définitions de structures pour les opérations sur les sockets
-#include <arpa/inet.h>    // Inclusion des définitions pour les opérations sur les adresses Internet
+#include <iostream>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
 
 #define PORT 8080
 
 int socket_setup() {
     int server_fd;        // File descriptor pour le socket du serveur
+    int connexion_socket; // socket qui representera une connection entrante
+    int valread;
     struct sockaddr_in address;  // Structure pour stocker l'adresse du serveur // sockaddr_in represent l'adresse d'un socket
     int opt = 1;          // Option utilisée pour configurer les options de socket
     int addrlen = sizeof(address);  // Taille de la structure d'adresse
+    char server_ip[INET_ADDRSTRLEN]; // chaine de character contenant l'adresse ipv4 du server
+    char client_ip[INET_ADDRSTRLEN]; // chaine de character contenant l'adresse ipv4 du client
+    char buffer[1024] = {0};
+
 
     // 1. Création du file descriptor pour le socket
     // le mot clé socket créé un point de terminaison pour la communication réseau. AF_INET = utilisation du protocol ipv4. SOCK_STRAM = socket de type stream. 0 = choix automatique du protocol.
@@ -73,10 +80,52 @@ int socket_setup() {
 
     std::cout << "Server is listening on port " << PORT << std::endl;  // Message indiquant que le serveur est en écoute
 
+    // 5. Acceptation des connexions entrantes
+    // accept est utiliser pour autorisé la connection entrante d'un client.
+    // connexion_socket = nouveau socket spécifique qui represente la connexion entrante.
+    // server_fd = socket en écoute
+    // (struct sockaddr*)&address = pointeur vers la structure qui sera remplis avec l'adresse et le port du client.
+    // (socklen_t*)&addrlen) =  Pointeur vers un entier qui spécifie la taille de la structure sockaddr pointée par address
+    while (1) {
+        struct sockaddr_in client_address;
+        socklen_t client_addrlen = sizeof(client_address);
+        if ((connexion_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
+            perror("accept");
+            close(server_fd);
+            exit(EXIT_FAILURE);
+        }
+        //inet_ntop sert a convertir une adresse ip en une chaine de character compréhensible pour un humain.
+        // AF_INTET -> ipv4
+        // &address.sin_addr = pointer vers l'adresse ip du socket en binaire.
+        // server_ip = chaine de character dans laquelle mettre l'adresse ip en chaine de character.
+        // INET_ADDRSTRLEN = taille d'une adresse ipv4
+        inet_ntop(AF_INET, &address.sin_addr, server_ip, INET_ADDRSTRLEN);
+        inet_ntop(AF_INET, &client_address.sin_addr, client_ip, INET_ADDRSTRLEN);
+        std::cout << "Connection established between server (" << server_ip << ") and client (" << client_ip << ")." << std::endl;
+
+        while (1){
+            // Lecture des données du client
+            // read lit les donnés du client via le socket client
+            // les donnés sont stocket dans la variable "buffer";
+            // 1024 = nombre maximal d'octet à lire
+            valread = read(connexion_socket, buffer, 1024);
+            std::cout << "Data received: " << buffer << std::endl;
+            
+            // Réponse au client (par exemple, accusé de réception)
+            char *response = "Message received by the server";
+            send(connexion_socket, response, strlen(response), 0);
+            printf("Hello message sent\n");
+            
+            memset(buffer, 0, sizeof(buffer));
+        }
+    }
+    // Fermeture du socket de la connexion client
+    close(connexion_socket);
+
     close(server_fd);  // Ferme le socket du serveur
     return 0;          // Terminaison normale du programme
 }
 
-// int main(){
-//     socket_setup();
-// }
+int main(){
+    socket_setup();
+}
