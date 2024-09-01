@@ -6,8 +6,17 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <vector>
+#include <fstream>
 
 #define PORT 8080
+
+
+// Fonction pour écrire un fichier en binaire
+void writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
+    std::ofstream file(filename, std::ios::binary);
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+}
 
 int socket_setup() {
     int server_fd;        // File descriptor pour le socket du serveur
@@ -86,6 +95,7 @@ int socket_setup() {
     // server_fd = socket en écoute
     // (struct sockaddr*)&address = pointeur vers la structure qui sera remplis avec l'adresse et le port du client.
     // (socklen_t*)&addrlen) =  Pointeur vers un entier qui spécifie la taille de la structure sockaddr pointée par address
+    int bytesRead = 0;
     while (1) {
         struct sockaddr_in client_address;
         socklen_t client_addrlen = sizeof(client_address);
@@ -103,21 +113,62 @@ int socket_setup() {
         inet_ntop(AF_INET, &client_address.sin_addr, client_ip, INET_ADDRSTRLEN);
         std::cout << "Connection established between server (" << server_ip << ") and client (" << client_ip << ")." << std::endl;
 
-        while (1){
             // Lecture des données du client
             // read lit les donnés du client via le socket client
             // les donnés sont stocket dans la variable "buffer";
             // 1024 = nombre maximal d'octet à lire
-            valread = read(connexion_socket, buffer, 1024);
-            std::cout << "Data received: " << buffer << std::endl;
+            // valread = read(connexion_socket, buffer, 1024);
+            // std::cout << "Data received: " << buffer << std::endl;
             
             // Réponse au client (par exemple, accusé de réception)
-            char *response = "Message received by the server";
-            send(connexion_socket, response, strlen(response), 0);
-            printf("Hello message sent\n");
-            
-            memset(buffer, 0, sizeof(buffer));
+            // const char *response = "Message received by the server: ";
+            // int response_len = strlen(response);
+            // int buffer_len = strlen(buffer);
+            // int total_response_len = response_len + buffer_len;
+            // char total_response[total_response_len + 1];
+            // strcpy(total_response, response);
+            // strcat(total_response, buffer);
+            // send(connexion_socket, total_response, strlen(total_response), 0);
+
+        std::vector<unsigned char> fileData;
+        while ((bytesRead = read(connexion_socket, buffer, sizeof(buffer))) > 0) {
+            std::cout << "bytesRead = " << bytesRead << std::endl;
+            std::string command(buffer, bytesRead);
+            if (command == "send_message") {
+                std::cout << "ready to receive message." << std::endl;
+                // Lire le message envoyé après la commande
+                bytesRead = read(connexion_socket, buffer, sizeof(buffer));
+                std::string message(buffer, bytesRead);
+                std::cout << "Message received from client: " << message << std::endl;
+
+                // Réponse au client
+                std::string response = "Message received: " + message;
+                send(connexion_socket, response.c_str(), response.size(), 0);
+            }
+            if (command == "upload_file"){
+                std::cout << "ready to receive file." << std::endl;
+                std::vector<unsigned char> fileData;
+                // Lire les données du fichier
+                // while ((bytesRead = read(connexion_socket, buffer, sizeof(buffer))) > 0) {
+                    // fileData.insert(fileData.end(), buffer, buffer + bytesRead);
+                // }
+
+                bytesRead = read(connexion_socket, buffer, sizeof(buffer));
+                fileData.insert(fileData.end(), buffer, buffer + bytesRead);
+                // Stocker le fichier reçu sur le disque
+                writeFile("received_file.txt", fileData);
+                std::cout << "File received and saved as 'received_file.txt'" << std::endl;
+
+                // Réponse au client (vous pouvez l'ajouter si nécessaire)
+                std::string response = "File received and saved successfully";
+                send(connexion_socket, response.c_str(), response.size(), 0);
+            }
         }
+
+        // Stocker le fichier reçu sur le disque
+        
+        // reinitialise le bloc memoir de buffer en le remplissant de 0
+        memset(buffer, 0, sizeof(buffer));
     }
     // Fermeture du socket de la connexion client
     close(connexion_socket);
