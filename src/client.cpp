@@ -94,6 +94,9 @@ int client_socket(){
             valread = read(client_socket, buffer, 1024);
             std::cout << "Server response: " << std::string(buffer, valread) << std::endl;
         }
+        else{
+            std::cout << "command " + command + " unknown.";
+        }
     }
     close(client_socket);  // Ferme le socket du serveur
     return 0;
