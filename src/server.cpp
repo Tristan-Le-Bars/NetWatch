@@ -9,37 +9,13 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include "../headers/server.h"
+#include "../headers/file_tools.h"
 
 #define PORT 8080
 
-
-// Fonction pour écrire un fichier en binaire
-void writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
-    std::ofstream file(filename, std::ios::binary);
-    file.write(reinterpret_cast<const char*>(data.data()), data.size());
-}
-
-bool fileExists(const std::string& filename) {
-    return std::filesystem::exists(filename);
-}
-
-std::vector<unsigned char> readFile(const std::string& filename) {
-    std::ifstream file(filename, std::ios::binary);
-    return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-}
-
-// Fonction pour obtenir la liste des fichiers dans un répertoire donné
-std::string listFilesInDirectory(const std::string& directory) {
-    std::string fileList;
-    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-        if (entry.is_regular_file()) {
-            fileList += entry.path().filename().string() + "\n";  // Add each file name to the list
-        }
-    }
-    return fileList.empty() ? "No files found." : fileList;
-}
-
-int socket_setup() {
+int Server::connexion_socket() {
+    FileTools file_manager;
     int server_fd;        // File descriptor pour le socket du serveur
     int connexion_socket; // socket qui representera une connection entrante
     int valread;
@@ -177,7 +153,7 @@ int socket_setup() {
                 bytesRead = read(connexion_socket, buffer, sizeof(buffer));
                 fileData.insert(fileData.end(), buffer, buffer + bytesRead);
                 // Stocker le fichier reçu sur le disque
-                writeFile("received_file.txt", fileData);
+                file_manager.writeFile("received_file.txt", fileData);
                 std::cout << "File received and saved as 'received_file.txt'" << std::endl;
 
                 // Réponse au client (vous pouvez l'ajouter si nécessaire)
@@ -186,7 +162,7 @@ int socket_setup() {
             }
             else if (command == "list_files") {
                 // List the files in the directory (e.g., the current directory)
-                std::string fileList = listFilesInDirectory(".");
+                std::string fileList = file_manager.listFilesInDirectory(".");
                 send(connexion_socket, fileList.c_str(), fileList.size(), 0);
                 std::cout << "Sent file list to client." << std::endl;
             }
@@ -194,16 +170,13 @@ int socket_setup() {
                 valread = read(connexion_socket, buffer, 1024);
                 std::string filename(buffer, valread);
 
-                if (fileExists(filename)) {
-                    std::vector<unsigned char> filedata = readFile(filename);
+                if (file_manager.fileExists(filename)) {
+                    std::vector<unsigned char> filedata = file_manager.readFile(filename);
 
                     // Envoyer un signal pour indiquer que le fichier existe
                     std::string response = "FILE_FOUND";
                     send(connexion_socket, response.c_str(), response.size(), 0);
 
-                    char ack_buffer[1024] = {0};
-                    read(connexion_socket, ack_buffer, 1024);
-                    
                     // Envoyer les données du fichier
                     send(connexion_socket, filedata.data(), filedata.size(), 0);
                     std::cout << "File sent: " << filename << std::endl;
@@ -226,8 +199,4 @@ int socket_setup() {
 
     close(server_fd);  // Ferme le socket du serveur
     return 0;          // Terminaison normale du programme
-}
-
-int main(){
-    socket_setup();
 }

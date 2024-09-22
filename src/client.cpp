@@ -7,20 +7,13 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include "../headers/file_tools.h"
+#include "../headers/client.h"
 
 #define PORT 8080
 
-std::vector<unsigned char> readFile(const std::string& filename) {
-    std::ifstream file(filename, std::ios::binary);
-    return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-}
-
-void writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
-    std::ofstream file(filename, std::ios::binary);
-    file.write(reinterpret_cast<const char*>(data.data()), data.size());
-}
-
-int client_socket(){
+int Client::client_socket(){
+    FileTools file_manager;
     int client_socket; // socket qui representera une connection entrante
     int valread;
     struct sockaddr_in server_address;
@@ -96,7 +89,7 @@ int client_socket(){
             std::cout << "do you want to encrypt the file ? (y/n): ";
             std::cin >> yes_no;
             // lit et envoie les donnée du fichier
-            std::vector<unsigned char> filedata = readFile(filename);
+            std::vector<unsigned char> filedata = file_manager.readFile(filename);
             send(client_socket, filedata.data(), filedata.size(), 0);
             std::cout << "File sent to server" << std::endl;
             std::fill(std::begin(buffer), std::end(buffer), 0);
@@ -124,7 +117,6 @@ int client_socket(){
             // Réception de la réponse du serveur
             int valread = read(client_socket, buffer, 1024);
             std::string response(buffer, valread);
-            std::cout << response << std::endl;
             if (response == "FILE_FOUND") {
                 std::vector<unsigned char> filedata;
                 int bytesRead;
@@ -134,7 +126,7 @@ int client_socket(){
                 filedata.insert(filedata.end(), buffer, buffer + bytesRead);
 
                 // Sauvegarder le fichier reçu
-                writeFile("downloaded_" + filename, filedata);
+                file_manager.writeFile("downloaded_" + filename, filedata);
                 std::cout << "File downloaded and saved as 'downloaded_" << filename << "'" << std::endl;
             }
             else if (response == "FILE_NOT_FOUND") {
@@ -148,7 +140,3 @@ int client_socket(){
     close(client_socket);  // Ferme le socket du serveur
     return 0;
 };
-
-int main(){
-    client_socket();
-}
