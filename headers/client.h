@@ -6,8 +6,8 @@
 
 class Client{
     private:
-        int client_socket();
     public:
+        int client_socket();
 };
 
 #endif
