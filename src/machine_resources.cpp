@@ -112,13 +112,13 @@ std::string MachineResources::getFormattedData(){
     std::string available_space_str = std::to_string(available_space);
     std::string cpu_usage_str = std::to_string(cpu_usage);
 
-    formated_data = "total_ram: " + total_ram_str + "\n" +
-                    "free_ram: " + free_ram_str + "\n" +
-                    "buffer_ram: " + buffer_ram_str + "\n" +
-                    "total_space: " + total_space_str + "\n" +
-                    "free_space: " + free_space_str + "\n" +
-                    "available_space: " + available_space_str + "\n" +
-                    "cpu_usage: " + cpu_usage_str + "\n";
+    formated_data = "total_ram: " + total_ram_str + " GB\n" +
+                    "free_ram: " + free_ram_str + " GB\n" +
+                    "buffer_ram: " + buffer_ram_str + " GB\n" +
+                    "total_space: " + total_space_str + " GB\n" +
+                    "free_space: " + free_space_str + " GB\n" +
+                    "available_space: " + available_space_str + " GB\n" +
+                    "cpu_usage: " + cpu_usage_str + "%\n";
 
     return formated_data;
 }
