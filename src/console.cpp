@@ -10,5 +10,5 @@ void console(){
 
 int main(){
     Server server;
-    server.connexion_socket();
+    server.connexionSocket();
 }

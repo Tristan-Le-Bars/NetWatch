@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <thread>
+#include <mutex>
 #include "../headers/file_tools.h"
 #include "../headers/client.h"
 #include "../headers/machine_resources.h"
@@ -51,10 +52,12 @@ Client::Client(){
     std::thread monitoring_thread(&Client::monitorResources, this);
     std::thread commands_thread(&Client::commandsHandler, this);
 
-    monitoring_thread.detach();
-    commands_thread.detach();
+    monitoring_thread.join();
+    commands_thread.join();
+    // monitoring_thread.detach();
+    // commands_thread.detach();
 
-    close(client_socket);  // Ferme le socket du serveur
+    // close(client_socket);  // Ferme le socket du serveur
 }
 
 Client::~Client(){
@@ -62,21 +65,29 @@ Client::~Client(){
 }
 
 void Client::monitorResources() {
-    while (true) {
-        machine_resources.updateResourcesInfo();
-        machine_resources.getUpTime();
-        machine_resources.getStorageUsage();
-        machine_resources.getRAMUsage();
-        machine_resources.getCPUUsage();
-
-        std::this_thread::sleep_for(std::chrono::seconds(1));  // Wait for 2 seconds before updating again
+    std::string formated_data;
+    try{
+        while (true) {
+            machine_resources->updateResourcesInfo();
+            machine_resources->getUpTime();
+            machine_resources->getRAMUsage();
+            machine_resources->getStorageUsage();
+            machine_resources->getCPUUsage();
+            
+            std::this_thread::sleep_for(std::chrono::seconds(1));  // Wait for 2 seconds before updating again
+        }
     }
+    catch (const std::exception& e) {
+        std::cerr << "Exception in monitorResources: " << e.what() << std::endl;
+    }
+
 }
 
 void Client::commandsHandler() {
+    std::cout << "entering commands handler" << std::endl;
     while (true) {
         std::string command;
-        std::cout << "$> ";
+        std::cout << "$> "; //FIX HERE
         std::cin >> command;
         send(client_socket, command.c_str(), strlen(command.c_str()), 0);
         
@@ -154,6 +165,20 @@ void Client::commandsHandler() {
             else if (response == "FILE_NOT_FOUND") {
                 std::cout << "File not found on the server." << std::endl;
             }
+        }
+        else if (command == "send_resources"){
+            std::cout << "through send_resources" << std::endl;
+            std::string resourcesData = machine_resources->getFormattedData();  // Assume getFormattedData() returns a formatted string of machine resources
+            std::cout << "Sending machine resources data to server..." << std::endl;
+            
+            // Send the "send_resources" command first
+            std::string command = "send_resources";
+            send(client_socket, command.c_str(), command.size(), 0);
+            
+            // Send the formatted resources data
+            send(client_socket, resourcesData.c_str(), resourcesData.size(), 0);
+            
+            std::cout << "Machine resources sent successfully!" << std::endl;
         }
         else {
             std::cout << "Command " << command << " unknown." << std::endl;

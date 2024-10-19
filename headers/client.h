@@ -3,6 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
+#include <memory>
+#include "machine_resources.h"
+#include "file_tools.h"
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 class Client{
     private:
@@ -13,7 +19,8 @@ class Client{
         socklen_t server_addrlen = sizeof(server_address);
         char client_ip[INET_ADDRSTRLEN];
         char buffer[1024] = {0};
-        MachineResources machine_resources;
+        // MachineResources machine_resources;
+        std::shared_ptr<MachineResources> machine_resources = std::make_shared<MachineResources>();
 
     public:
         Client();

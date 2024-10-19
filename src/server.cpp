@@ -9,12 +9,13 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include <thread>
 #include "../headers/server.h"
 #include "../headers/file_tools.h"
 
 #define PORT 8080
 
-int Server::connexion_socket() {
+int Server::connexionSocket() {
     FileTools file_manager;
     int server_fd;        // File descriptor pour le socket du serveur
     int connexion_socket; // socket qui representera une connection entrante
@@ -96,61 +97,54 @@ int Server::connexion_socket() {
     while (1) {
         struct sockaddr_in client_address;
         socklen_t client_addrlen = sizeof(client_address);
+        int connexion_socket;
         if ((connexion_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
             perror("accept");
-            close(server_fd);
-            exit(EXIT_FAILURE);
+            continue;
         }
-        //inet_ntop sert a convertir une adresse ip en une chaine de character compréhensible pour un humain.
-        // AF_INTET -> ipv4
-        // &address.sin_addr = pointer vers l'adresse ip du socket en binaire.
-        // server_ip = chaine de character dans laquelle mettre l'adresse ip en chaine de character.
-        // INET_ADDRSTRLEN = taille d'une adresse ipv4
-        inet_ntop(AF_INET, &address.sin_addr, server_ip, INET_ADDRSTRLEN);
-        inet_ntop(AF_INET, &client_address.sin_addr, client_ip, INET_ADDRSTRLEN);
-        std::cout << "Connection established between server (" << server_ip << ") and client (" << client_ip << ")." << std::endl;
+        // Créez un thread pour chaque connexion client
+        std::thread client_thread(&Server::clientHandler, this, connexion_socket, std::ref(client_address));
+        client_thread.detach();  // Détachez le thread pour qu'il puisse fonctionner indépendamment
+    }
+    // Fermeture du socket de la connexion client
+    close(connexion_socket);
 
-            // Lecture des données du client
-            // read lit les donnés du client via le socket client
-            // les donnés sont stocket dans la variable "buffer";
-            // 1024 = nombre maximal d'octet à lire
-            // valread = read(connexion_socket, buffer, 1024);
-            // std::cout << "Data received: " << buffer << std::endl;
-            
-            // Réponse au client (par exemple, accusé de réception)
-            // const char *response = "Message received by the server: ";
-            // int response_len = strlen(response);
-            // int buffer_len = strlen(buffer);
-            // int total_response_len = response_len + buffer_len;
-            // char total_response[total_response_len + 1];
-            // strcpy(total_response, response);
-            // strcat(total_response, buffer);
-            // send(connexion_socket, total_response, strlen(total_response), 0);
+    close(server_fd);  // Ferme le socket du serveur
+    return 0;          // Terminaison normale du programme
+}
 
-        std::vector<unsigned char> fileData;
-        while ((bytesRead = read(connexion_socket, buffer, sizeof(buffer))) > 0) {
+int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
+    char client_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &client_address.sin_addr, client_ip, INET_ADDRSTRLEN);
+    std::cout << "Connection established with client (" << client_ip << ")." << std::endl;
+
+    FileTools file_manager;
+    char buffer[1024] = {0};
+    int bytesRead;
+
+    while ((bytesRead = read(client_socket, buffer, sizeof(buffer))) > 0) {
             // std::cout << "bytesRead = " << bytesRead << std::endl;
             std::string command(buffer, bytesRead);
             if (command == "send_message") {
                 std::cout << "ready to receive message." << std::endl;
                 // Lire le message envoyé après la commande
-                bytesRead = read(connexion_socket, buffer, sizeof(buffer));
+                bytesRead = read(client_socket, buffer, sizeof(buffer));
                 std::string message(buffer, bytesRead);
                 std::cout << "Message received from client: " << message << std::endl;
 
                 // Réponse au client
                 std::string response = "Message received: " + message;
-                send(connexion_socket, response.c_str(), response.size(), 0);
+                send(client_socket, response.c_str(), response.size(), 0);
             }
             else if (command == "upload_file"){
                 std::cout << "ready to receive file." << std::endl;
                 std::vector<unsigned char> fileData;
                 // Lire les données du fichier
-                // while ((bytesRead = read(connexion_socket, buffer, sizeof(buffer))) > 0) {
+                // while ((bytesRead = read(client_socket, buffer, sizeof(buffer))) > 0) {
                     // fileData.insert(fileData.end(), buffer, buffer + bytesRead);
                 // }
 
-                bytesRead = read(connexion_socket, buffer, sizeof(buffer));
+                bytesRead = read(client_socket, buffer, sizeof(buffer));
                 fileData.insert(fileData.end(), buffer, buffer + bytesRead);
                 // Stocker le fichier reçu sur le disque
                 file_manager.writeFile("received_file.txt", fileData);
@@ -158,45 +152,50 @@ int Server::connexion_socket() {
 
                 // Réponse au client (vous pouvez l'ajouter si nécessaire)
                 std::string response = "File received and saved successfully";
-                send(connexion_socket, response.c_str(), response.size(), 0);
+                send(client_socket, response.c_str(), response.size(), 0);
             }
             else if (command == "list_files") {
                 // List the files in the directory (e.g., the current directory)
                 std::string fileList = file_manager.listFilesInDirectory(".");
-                send(connexion_socket, fileList.c_str(), fileList.size(), 0);
+                send(client_socket, fileList.c_str(), fileList.size(), 0);
                 std::cout << "Sent file list to client." << std::endl;
             }
             else if (command == "download_file"){
-                valread = read(connexion_socket, buffer, 1024);
-                std::string filename(buffer, valread);
+                bytesRead = read(client_socket, buffer, 1024);
+                std::string filename(buffer, bytesRead);
 
                 if (file_manager.fileExists(filename)) {
                     std::vector<unsigned char> filedata = file_manager.readFile(filename);
 
                     // Envoyer un signal pour indiquer que le fichier existe
                     std::string response = "FILE_FOUND";
-                    send(connexion_socket, response.c_str(), response.size(), 0);
+                    send(client_socket, response.c_str(), response.size(), 0);
 
                     // Envoyer les données du fichier
-                    send(connexion_socket, filedata.data(), filedata.size(), 0);
+                    send(client_socket, filedata.data(), filedata.size(), 0);
                     std::cout << "File sent: " << filename << std::endl;
                 } else {
                     // Envoyer un signal pour indiquer que le fichier n'existe pas
                     std::string response = "FILE_NOT_FOUND";
-                    send(connexion_socket, response.c_str(), response.size(), 0);
+                    send(client_socket, response.c_str(), response.size(), 0);
                     std::cout << "File not found: " << filename << std::endl;
                 }
             }
+            else if (command == "send_resources") {
+                // Read the incoming machine resources data
+                bytesRead = read(client_socket, buffer, 1024);  // Read the data into the buffer
+                std::string resourcesData(buffer, bytesRead);
+
+                // Display the received data or process it as needed
+                std::cout << "Received machine resources data from client:" << std::endl;
+                std::cout << resourcesData << std::endl;
+                
+                // Optionally, send a response back to the client
+                std::string response = "Machine resources data received";
+                send(client_socket, response.c_str(), response.size(), 0);
+            }
         }
-
-        // Stocker le fichier reçu sur le disque
-        
-        // reinitialise le bloc memoir de buffer en le remplissant de 0
-        memset(buffer, 0, sizeof(buffer));
-    }
-    // Fermeture du socket de la connexion client
-    close(connexion_socket);
-
-    close(server_fd);  // Ferme le socket du serveur
-    return 0;          // Terminaison normale du programme
+    std::cout << "Client disconnected: " << client_ip << std::endl;
+    close(client_socket);
+    return 0;
 }

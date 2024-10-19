@@ -3,13 +3,13 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
-#include "../headers/machine_ressources.h"
+#include "../headers/machine_resources.h"
 
 
-MachineRessources::MachineRessources(){
+MachineResources::MachineResources(){
+    // std::lock_guard<std::mutex> lock(resourceMutex);
     // Open /proc/stat
     setProcStat();
-
     // Read the first line (cpu stats)
     fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
             &user, &nice, &system, &idle, &iowait, &irq, &softirq);
@@ -20,19 +20,21 @@ MachineRessources::MachineRessources(){
     total_idle = idle + iowait;
 }
 
-MachineRessources::~MachineRessources(){
+MachineResources::~MachineResources(){
 
 }
 
 
-void MachineRessources::updateRessourcesInfo(){
+void MachineResources::updateResourcesInfo(){
+    std::lock_guard<std::mutex> lock(resourceMutex);// good
     setSysinfo();
     setStatvfs();
-    setProcStat();
+    // setProcStat();
+    // fclose(proc_stat);
 }
 
 
-int MachineRessources::setSysinfo(){
+int MachineResources::setSysinfo(){
     if (sysinfo(&info) != 0) {
         perror("sysinfo failed");
         return -1;
@@ -40,7 +42,7 @@ int MachineRessources::setSysinfo(){
     return 0;
 }
 
-int MachineRessources::setStatvfs(){
+int MachineResources::setStatvfs(){
     if (statvfs("/", &stat) != 0) {
         perror("statvfs failed");
         return -1;
@@ -48,7 +50,7 @@ int MachineRessources::setStatvfs(){
     return 0;
 }
 
-int MachineRessources::setProcStat(){
+int MachineResources::setProcStat(){
     proc_stat = fopen("/proc/stat", "r");
     if (proc_stat == NULL) {
         perror("Failed to open /proc/stat");
@@ -57,25 +59,29 @@ int MachineRessources::setProcStat(){
     return 0;
 }
 
-std::string MachineRessources::getUpTime(){
-    
+std::string MachineResources::getUpTime(){
+    std::lock_guard<std::mutex> lock(resourceMutex);
+    return "getUpTime not implemented";
 }
 
-void MachineRessources::getStorageUsage(){
-    total_space = stat.f_blocks * stat.f_frsize; // Total size in bytes
-    free_space = stat.f_bfree * stat.f_frsize;   // Free space in bytes
-    available_space = stat.f_bavail * stat.f_frsize; // Available space in bytes
+void MachineResources::getStorageUsage(){
+    std::lock_guard<std::mutex> lock(resourceMutex);
+    total_space = (stat.f_blocks * stat.f_frsize) / (1024.0 * 1024 * 1024); // Total size in bytes
+    free_space = (stat.f_bfree * stat.f_frsize) / (1024.0 * 1024 * 1024);   // Free space in bytes
+    available_space = (stat.f_bavail * stat.f_frsize) / (1024.0 * 1024 * 1024); // Available space in bytes
 }
 
-void MachineRessources::getRAMUsage(){
+void MachineResources::getRAMUsage(){
+    std::lock_guard<std::mutex> lock(resourceMutex);
     // Calculate and display RAM data in megabytes
-    total_ram_mb = info.totalram / (1024 * 1024); // Convert bytes to MB
-    free_ram_mb = info.freeram / (1024 * 1024);   // Convert bytes to MB
-    buffer_ram_mb = info.bufferram / (1024 * 1024); // Convert bytes to MB
-    cached_ram_mb = info.cachedram / (1024 * 1024); // Convert bytes to MB
+    total_ram_mb = info.totalram / (1024.0 * 1024.0 * 1024.0); // Convert bytes to MB
+    free_ram_mb = info.freeram / (1024.0 * 1024.0 * 1024.0);   // Convert bytes to MB
+    buffer_ram_mb = info.bufferram / (1024.0 * 1024.0 * 1024.0); // Convert bytes to MB
+    // cached_ram_mb = info.cachedram / (1024 * 1024); // Convert bytes to MB
 }
 
-void MachineRessources::getCPUUsage(){
+void MachineResources::getCPUUsage(){
+    std::lock_guard<std::mutex> lock(resourceMutex);
     // Read the stats again
     setProcStat();
     fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
@@ -90,6 +96,29 @@ void MachineRessources::getCPUUsage(){
     cpu_usage = 100 * (1 - (double)(total_idle - (idle + iowait)) / (total2 - total1));
 
     // Print CPU usage
-    printf("CPU Usage: %llu%%\n", cpu_usage);
-    total1 = total2
+    // printf("CPU Usage: %llu%%\n", cpu_usage);
+    total1 = total2;
+}
+
+std::string MachineResources::getFormattedData(){
+    std::lock_guard<std::mutex> lock(resourceMutex);
+    std::string formated_data;
+    std::string total_ram_str = std::to_string(total_ram_mb);
+    std::string free_ram_str = std::to_string(free_ram_mb);
+    std::string buffer_ram_str = std::to_string(buffer_ram_mb);
+
+    std::string total_space_str = std::to_string(total_space);
+    std::string free_space_str = std::to_string(free_space);
+    std::string available_space_str = std::to_string(available_space);
+    std::string cpu_usage_str = std::to_string(cpu_usage);
+
+    formated_data = "total_ram: " + total_ram_str + "\n" +
+                    "free_ram: " + free_ram_str + "\n" +
+                    "buffer_ram: " + buffer_ram_str + "\n" +
+                    "total_space: " + total_space_str + "\n" +
+                    "free_space: " + free_space_str + "\n" +
+                    "available_space: " + available_space_str + "\n" +
+                    "cpu_usage: " + cpu_usage_str + "\n";
+
+    return formated_data;
 }

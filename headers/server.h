@@ -7,7 +7,8 @@
 class Server{
     private:
     public:
-        int connexion_socket();
+        int connexionSocket();
+        int clientHandler(int client_socket, struct sockaddr_in client_address);
         void server_console();
 };
 

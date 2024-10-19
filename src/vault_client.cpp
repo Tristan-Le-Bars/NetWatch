@@ -2,5 +2,5 @@
 
 int main(){
     Client client;
-    client.client_socket();
+    return 0;
 }

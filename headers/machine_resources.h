@@ -8,9 +8,9 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
+#include <mutex>
 
 class MachineResources {
-
     public:
         MachineResources();
         ~MachineResources();
@@ -20,18 +20,19 @@ class MachineResources {
         void getRAMUsage();
         void getCPUUsage();
         void updateResourcesInfo();
+        std::string getFormattedData();
 
     private:
         struct sysinfo info;
-        long total_ram_mb;
-        long free_ram_mb;
-        long buffer_ram_mb;
-        long cached_ram_mb;
+        double total_ram_mb;
+        double free_ram_mb;
+        double buffer_ram_mb;
+        double cached_ram_mb;
 
         struct statvfs stat;
-        unsigned long total_space;
-        unsigned long free_space;
-        unsigned long available_space;
+        double total_space;
+        double free_space;
+        double available_space;
 
         FILE *proc_stat;
         unsigned long long int user, nice, system, idle, iowait, irq, softirq, total1, total2;
@@ -41,7 +42,7 @@ class MachineResources {
         int setStatvfs();
         int setProcStat();
         
-
+        std::mutex resourceMutex;
 };
 
-#endif
+#endif 
