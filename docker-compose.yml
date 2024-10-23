@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server  # Assurez-vous que le nom est correct
+    ports:
+      - "8080:8080"  # Redirigez le port 8080 du conteneur vers le port 8080 de votre machine
+
+  client_one:
+    build:
+      context: .
+      dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+    depends_on:
+      - server  # Le client dépend du serveur
+
+  client_two:
+    build:
+      context: .
+      dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+    depends_on:
+      - server  # Le client dépend du serveur

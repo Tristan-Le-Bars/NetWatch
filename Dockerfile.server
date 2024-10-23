@@ -1,0 +1,30 @@
+FROM ubuntu:22.04
+
+# Install necessary packages: g++, make, and networking libraries
+RUN apt-get update && apt-get install -y \
+    g++ \
+    make \
+    libstdc++6 \
+    libc-dev \
+    net-tools \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create and set the working directory
+WORKDIR /usr/src/app
+
+# Copy the server source code and header files to the container
+# COPY ./src/ /app/src/
+# COPY ./headers/ /app/headers/
+# COPY Makefile /app/
+
+COPY . .
+
+# Compile the server
+RUN make server
+
+# Expose port 8080 to allow communication to the server
+EXPOSE 8080
+
+# Start the server
+CMD ["./server"]

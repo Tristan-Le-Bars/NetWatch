@@ -1,0 +1,27 @@
+# Use an official Ubuntu base image
+FROM ubuntu:22.04
+
+# Install necessary packages: g++, make, and networking libraries
+RUN apt-get update && apt-get install -y \
+    g++ \
+    make \
+    net-tools \
+    iputils-ping \
+    libc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create and set the working directory
+WORKDIR /usr/src/app
+
+# Copy the client source code and header files to the container
+# COPY ./src/ /app/src/
+# COPY ./headers/ /app/headers/
+# COPY Makefile /app/
+
+COPY . .
+
+# Compile the client code
+RUN make client
+
+# Command to run the client application (you can customize the server IP and port here)
+# CMD ["./client", "127.0.0.1", "8080"]
