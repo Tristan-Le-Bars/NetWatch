@@ -31,7 +31,7 @@ Client::Client(){
     //AF_INET -> ipv4
     // adresse ip !changer pour pouvoir la rentrer manuellement;
     // adresse vers le sockaddr_in qui stockeras l'adresse en format binaire
-    if (inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, "0.0.0.0", &server_address.sin_addr) <= 0) {
         std::cout << "Invalid address/ Address not supported" << std::endl;
         // return -1;
     }
@@ -73,6 +73,8 @@ void Client::monitorResources() {
             machine_resources->getRAMUsage();
             machine_resources->getStorageUsage();
             machine_resources->getCPUUsage();
+            // send(client_socket, "send_resources", strlen("send_resources"), 0);
+            sendMachineResources();
             
             std::this_thread::sleep_for(std::chrono::seconds(1));  // Wait for 2 seconds before updating again
         }
@@ -85,6 +87,7 @@ void Client::monitorResources() {
 
 void Client::commandsHandler() {
     std::cout << "entering commands handler" << std::endl;
+    
     while (true) {
         std::string command;
         std::cout << "$> "; //FIX HERE
@@ -167,21 +170,21 @@ void Client::commandsHandler() {
             }
         }
         else if (command == "send_resources"){
-            std::cout << "through send_resources" << std::endl;
-            std::string resourcesData = machine_resources->getFormattedData();  // Assume getFormattedData() returns a formatted string of machine resources
-            std::cout << "Sending machine resources data to server..." << std::endl;
-            
-            // Send the "send_resources" command first
-            std::string command = "send_resources";
-            send(client_socket, command.c_str(), command.size(), 0);
-            
-            // Send the formatted resources data
-            send(client_socket, resourcesData.c_str(), resourcesData.size(), 0);
-            
-            std::cout << "Machine resources sent successfully!" << std::endl;
+            sendMachineResources();
         }
         else {
             std::cout << "Command " << command << " unknown." << std::endl;
         }
     }
+}
+
+void Client::sendMachineResources(){
+    std::string resourcesData = machine_resources->getFormattedData();
+    
+    // Send the "send_resources" command firsts
+    std::string command = "send_resources";
+    send(client_socket, command.c_str(), command.size(), 0);
+    
+    // Send the formatted resources data
+    send(client_socket, resourcesData.c_str(), resourcesData.size(), 0);
 }

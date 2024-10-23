@@ -21,12 +21,14 @@ class Client{
         char buffer[1024] = {0};
         // MachineResources machine_resources;
         std::shared_ptr<MachineResources> machine_resources = std::make_shared<MachineResources>();
-
+        std::mutex socketMutex;
+        
     public:
         Client();
         ~Client();
         void commandsHandler();
         void monitorResources();
+        void sendMachineResources();
 };
 
 #endif
