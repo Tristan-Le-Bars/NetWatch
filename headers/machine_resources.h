@@ -12,7 +12,7 @@
 
 class MachineResources {
     public:
-        MachineResources();
+        MachineResources(std::string id);
         ~MachineResources();
 
         std::string getUpTime();
@@ -23,6 +23,7 @@ class MachineResources {
         std::string getFormattedData();
 
     private:
+        std::string client_id;
         struct sysinfo info;
         double total_ram_mb;
         double free_ram_mb;

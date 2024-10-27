@@ -6,9 +6,12 @@
 #include "../headers/machine_resources.h"
 
 
-MachineResources::MachineResources(){
+
+MachineResources::MachineResources(std::string id){
     // std::lock_guard<std::mutex> lock(resourceMutex);
     // Open /proc/stat
+    // setId();
+    client_id = id;
     setProcStat();
     // Read the first line (cpu stats)
     fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
@@ -103,6 +106,7 @@ void MachineResources::getCPUUsage(){
 std::string MachineResources::getFormattedData(){
     std::lock_guard<std::mutex> lock(resourceMutex);
     
+    std::string datatype = "resources_data";
     std::string formated_data;
     std::string total_ram_str = std::to_string(total_ram_mb);
     std::string free_ram_str = std::to_string(free_ram_mb);
@@ -113,13 +117,20 @@ std::string MachineResources::getFormattedData(){
     std::string available_space_str = std::to_string(available_space);
     std::string cpu_usage_str = std::to_string(cpu_usage);
 
-    formated_data = "{\n    total_ram: " + total_ram_str + ",\n" +
-                    "   free_ram: " + free_ram_str + ",\n" +
-                    "   buffer_ram: " + buffer_ram_str + ",\n" +
-                    "   total_space: " + total_space_str + ",\n" +
-                    "   free_space: " + free_space_str + ",\n" +
-                    "   available_space: " + available_space_str + ",\n" +
-                    "   cpu_usage: " + cpu_usage_str + ",\n}";
+  
+       formated_data = "{\n   \"datatype\":"  + datatype + ",\n" +
+                    "   \"client_id\":" + client_id + ",\n"
+                    "   \"resources\": {"  + "\n" +
+                    "       \"total_ram\": " + total_ram_str + ",\n" +
+                    "       \"free_ram\": " + free_ram_str + ",\n" +
+                    "       \"buffer_ram\": " + buffer_ram_str + ",\n" +
+                    "       \"total_space\": " + total_space_str + ",\n" +
+                    "       \"free_space\": " + free_space_str + ",\n" +
+                    "       \"available_space\": " + available_space_str + ",\n" +
+                    "       \"cpu_usage\": " + cpu_usage_str + "\n}" +
+                    "   }\n" +
+                    "}";
 
     return formated_data;
 }
+

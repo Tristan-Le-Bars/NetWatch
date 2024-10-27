@@ -12,6 +12,7 @@
 
 class Client{
     private:
+        std::string id;
         FileTools file_manager;
         int client_socket; // socket qui representera une connection entrante
         int valread;
@@ -20,12 +21,17 @@ class Client{
         char client_ip[INET_ADDRSTRLEN];
         char buffer[1024] = {0};
         // MachineResources machine_resources;
-        std::shared_ptr<MachineResources> machine_resources = std::make_shared<MachineResources>();
+        std::shared_ptr<MachineResources> machine_resources;
         std::mutex socketMutex;
         
     public:
         Client();
         ~Client();
+
+        void setId();
+
+        std::string getId();
+
         void commandsHandler();
         void monitorResources();
         void sendMachineResources();

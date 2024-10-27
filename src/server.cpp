@@ -104,7 +104,7 @@ int Server::connexionSocket() {
         }
         // Créez un thread pour chaque connexion client
         std::thread client_thread(&Server::clientHandler, this, connexion_socket, std::ref(client_address));
-        client_thread.join();  // Détachez le thread pour qu'il puisse fonctionner indépendamment
+        client_thread.detach();  // Détachez le thread pour qu'il puisse fonctionner indépendamment
     }
     // Fermeture du socket de la connexion client
     close(connexion_socket);

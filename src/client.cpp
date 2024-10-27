@@ -8,7 +8,9 @@
 #include <filesystem>
 #include <algorithm>
 #include <thread>
-#include <mutex>
+#include <random>
+#include <iomanip>
+
 
 #include "../headers/file_tools.h"
 #include "../headers/client.h"
@@ -18,6 +20,8 @@
 #define PORT 8080
 
 Client::Client(){
+    setId();
+    machine_resources = std::make_shared<MachineResources>(id);
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Client socket creation failed");  // Affiche un message d'erreur en cas d'échec de la création du socket
         exit(EXIT_FAILURE);       // Quitte le programme avec un code d'échec
@@ -188,4 +192,26 @@ void Client::sendMachineResources(){
     
     // Send the formatted resources data
     send(client_socket, resourcesData.c_str(), resourcesData.size(), 0);
+}
+
+void Client::setId() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 15);
+
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0');
+
+    for (int i = 0; i < 8; i++) ss << std::setw(1) << dis(gen);
+    ss << "-";
+    for (int i = 0; i < 4; i++) ss << std::setw(1) << dis(gen);
+    ss << "-4"; // version 4
+    for (int i = 0; i < 3; i++) ss << std::setw(1) << dis(gen);
+    ss << "-";
+    ss << std::setw(1) << ((dis(gen) & 0x3) | 0x8); // version variant bits
+    for (int i = 0; i < 3; i++) ss << std::setw(1) << dis(gen);
+    ss << "-";
+    for (int i = 0; i < 12; i++) ss << std::setw(1) << dis(gen);
+
+    id = ss.str();
 }
