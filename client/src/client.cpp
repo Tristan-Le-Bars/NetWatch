@@ -12,9 +12,9 @@
 #include <iomanip>
 
 
-#include "../headers/file_tools.h"
-#include "../headers/client.h"
-#include "../headers/machine_resources.h"
+#include "../include/file_tools.h"
+#include "../include/client.h"
+#include "../include/machine_resources.h"
 
 
 #define PORT 8080

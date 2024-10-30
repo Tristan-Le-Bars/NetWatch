@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
-#include "../headers/machine_resources.h"
+#include "../include/machine_resources.h"
 
 
 

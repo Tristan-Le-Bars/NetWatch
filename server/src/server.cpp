@@ -10,8 +10,8 @@
 #include <fstream>
 #include <filesystem>
 #include <thread>
-#include "../headers/server.h"
-#include "../headers/file_tools.h"
+#include "../include/server.h"
+#include "../include/file_tools.h"
 
 #define PORT 8080
 
