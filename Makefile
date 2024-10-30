@@ -15,12 +15,12 @@ SHARED_HEADER_DIR = shared/include
 # Fichiers sources et objets pour le serveur
 SERVER_SOURCES = $(SERVER_SRC_DIR)/server.cpp $(SERVER_SRC_DIR)/console.cpp $(SHARED_SRC_DIR)/file_tools.cpp
 SERVER_OBJECTS = $(SERVER_SOURCES:.cpp=.o)
-SERVER_EXEC = server
+SERVER_EXEC = netwatch_server
 
 # Fichiers sources et objets pour le client
 CLIENT_SOURCES = $(CLIENT_SRC_DIR)/client.cpp $(CLIENT_SRC_DIR)/vault_client.cpp $(CLIENT_SRC_DIR)/machine_resources.cpp $(SHARED_SRC_DIR)/file_tools.cpp
 CLIENT_OBJECTS = $(CLIENT_SOURCES:.cpp=.o)
-CLIENT_EXEC = client
+CLIENT_EXEC = netwatch_client
 
 # Règle par défaut : compiler tout
 all: $(SERVER_EXEC) $(CLIENT_EXEC)
