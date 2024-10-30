@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "../headers/server.h"
+#include "../include/server.h"
 
 
 void console(){
