@@ -10,10 +10,12 @@
 #include <fstream>
 #include <filesystem>
 #include <thread>
+#include <mutex>
 #include "../include/server.h"
 #include "../include/file_tools.h"
 
-#define PORT 8080
+#define FRONTEND_WEBSOCKET_PORT 9002
+#define CLIENT_PORT 8080
 
 int Server::connexionSocket() {
     FileTools file_manager;
@@ -59,7 +61,7 @@ int Server::connexionSocket() {
     // 3. Bind du socket à une adresse et un port
     address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
     address.sin_addr.s_addr = INADDR_ANY;  // Accepte les connexions de n'importe quelle adresse réseau // sin_addr.s_addr = adresse IP
-    address.sin_port = htons(PORT);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
+    address.sin_port = htons(CLIENT_PORT);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
 
     // Lie le socket à l'adresse et au port spécifiés
     // bind associe un socket à une adresse IP et à un port local
@@ -85,7 +87,7 @@ int Server::connexionSocket() {
         exit(EXIT_FAILURE);       // Quitte le programme avec un code d'échec
     }
 
-    std::cout << "Server is listening on port " << PORT << std::endl;  // Message indiquant que le serveur est en écoute
+    std::cout << "Server is listening on port " << CLIENT_PORT << std::endl;  // Message indiquant que le serveur est en écoute
 
     // 5. Acceptation des connexions entrantes
     // accept est utiliser pour autorisé la connection entrante d'un client.
@@ -111,6 +113,52 @@ int Server::connexionSocket() {
 
     close(server_fd);  // Ferme le socket du serveur
     return 0;          // Terminaison normale du programme
+}
+
+int Server::monitoringSocket(){
+    int server_fd;
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(FRONTEND_WEBSOCKET_PORT);
+
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    while (true) {
+        int new_socket;
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+            perror("Accept");
+            continue;
+        }
+        // Get the received data and send them to the front end
+        std::lock_guard<std::mutex> lock(client_mutex);
+        admin_sockets.push_back(new_socket);
+        std::cout << "Front-end client connected." << std::endl;
+    }
 }
 
 int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
@@ -193,6 +241,18 @@ int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
                 // Optionally, send a response back to the client
                 std::string response = "Machine resources data received";
                 send(client_socket, response.c_str(), response.size(), 0);
+
+                // Send data to the admin front-end
+                {
+                    std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
+
+                    for (int frontend_socket : admin_sockets) {
+                        int send_result = send(frontend_socket, resourcesData.c_str(), resourcesData.size(), 0);
+                        if (send_result < 0) {
+                            std::cerr << "Erreur d'envoi des données au client front-end" << std::endl;
+                        }
+                    }
+                }
             }
         }
     std::cout << "Client disconnected: " << client_ip << std::endl;
