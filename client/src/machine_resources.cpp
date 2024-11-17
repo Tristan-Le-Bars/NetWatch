@@ -127,7 +127,7 @@ std::string MachineResources::getFormattedData(){
                     "       \"total_space\": " + total_space_str + ",\n" +
                     "       \"free_space\": " + free_space_str + ",\n" +
                     "       \"available_space\": " + available_space_str + ",\n" +
-                    "       \"cpu_usage\": " + cpu_usage_str + "\n}" +
+                    "       \"cpu_usage\": " + cpu_usage_str + "\n" +
                     "   }\n" +
                     "}";
 

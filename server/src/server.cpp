@@ -148,17 +148,17 @@ int Server::monitoringSocket(){
         exit(EXIT_FAILURE);
     }
 
-    while (true) {
-        int new_socket;
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-            perror("Accept");
-            continue;
-        }
-        // Get the received data and send them to the front end
-        std::lock_guard<std::mutex> lock(client_mutex);
-        admin_sockets.push_back(new_socket);
-        std::cout << "Front-end client connected." << std::endl;
+    // while (true) {
+    int new_socket;
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+        perror("Accept");
+        // continue;
     }
+    // Get the received data and send them to the front end
+    // std::lock_guard<std::mutex> lock(client_mutex);
+    admin_sockets.push_back(new_socket);
+    std::cout << "Front-end client connected." << std::endl;
+    // }
 }
 
 int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
@@ -171,65 +171,8 @@ int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
     int bytesRead;
 
     while ((bytesRead = read(client_socket, buffer, sizeof(buffer))) > 0) {
-            // std::cout << "bytesRead = " << bytesRead << std::endl;
             std::string command(buffer, bytesRead);
-            if (command == "send_message") {
-                std::cout << "ready to receive message." << std::endl;
-                // Lire le message envoyé après la commande
-                bytesRead = read(client_socket, buffer, sizeof(buffer));
-                std::string message(buffer, bytesRead);
-                std::cout << "Message received from client: " << message << std::endl;
-
-                // Réponse au client
-                std::string response = "Message received: " + message;
-                send(client_socket, response.c_str(), response.size(), 0);
-            }
-            else if (command == "upload_file"){
-                std::cout << "ready to receive file." << std::endl;
-                std::vector<unsigned char> fileData;
-                // Lire les données du fichier
-                // while ((bytesRead = read(client_socket, buffer, sizeof(buffer))) > 0) {
-                    // fileData.insert(fileData.end(), buffer, buffer + bytesRead);
-                // }
-
-                bytesRead = read(client_socket, buffer, sizeof(buffer));
-                fileData.insert(fileData.end(), buffer, buffer + bytesRead);
-                // Stocker le fichier reçu sur le disque
-                file_manager.writeFile("received_file.txt", fileData);
-                std::cout << "File received and saved as 'received_file.txt'" << std::endl;
-
-                // Réponse au client (vous pouvez l'ajouter si nécessaire)
-                std::string response = "File received and saved successfully";
-                send(client_socket, response.c_str(), response.size(), 0);
-            }
-            else if (command == "list_files") {
-                // List the files in the directory (e.g., the current directory)
-                std::string fileList = file_manager.listFilesInDirectory(".");
-                send(client_socket, fileList.c_str(), fileList.size(), 0);
-                std::cout << "Sent file list to client." << std::endl;
-            }
-            else if (command == "download_file"){
-                bytesRead = read(client_socket, buffer, 1024);
-                std::string filename(buffer, bytesRead);
-
-                if (file_manager.fileExists(filename)) {
-                    std::vector<unsigned char> filedata = file_manager.readFile(filename);
-
-                    // Envoyer un signal pour indiquer que le fichier existe
-                    std::string response = "FILE_FOUND";
-                    send(client_socket, response.c_str(), response.size(), 0);
-
-                    // Envoyer les données du fichier
-                    send(client_socket, filedata.data(), filedata.size(), 0);
-                    std::cout << "File sent: " << filename << std::endl;
-                } else {
-                    // Envoyer un signal pour indiquer que le fichier n'existe pas
-                    std::string response = "FILE_NOT_FOUND";
-                    send(client_socket, response.c_str(), response.size(), 0);
-                    std::cout << "File not found: " << filename << std::endl;
-                }
-            }
-            else if (command == "send_resources") {
+            if (command == "send_resources") {
                 // Read the incoming machine resources data
                 bytesRead = read(client_socket, buffer, 1024);  // Read the data into the buffer
                 std::string resourcesData(buffer, bytesRead);
@@ -243,14 +186,19 @@ int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
                 send(client_socket, response.c_str(), response.size(), 0);
 
                 // Send data to the admin front-end
-                {
-                    std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
-
-                    for (int frontend_socket : admin_sockets) {
-                        int send_result = send(frontend_socket, resourcesData.c_str(), resourcesData.size(), 0);
-                        if (send_result < 0) {
-                            std::cerr << "Erreur d'envoi des données au client front-end" << std::endl;
-                        }
+                // std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
+                std::cout << 'list of frontend sockets:' << std::endl;
+                for (int frontend_socket : admin_sockets){
+                    std::cout << "  - "<< frontend_socket << std::endl;
+                }
+                for (int frontend_socket : admin_sockets) {
+                    std::cout << "try to send data to the front-end " << frontend_socket << std::endl;
+                    
+                    std::cout << "data sent :" << std::endl << resourcesData.c_str() << std::endl;
+                    int send_result = send(frontend_socket, resourcesData.c_str(), resourcesData.size(), 0);
+                    std::cout << "send result = " << send_result << std::endl;
+                    if (send_result < 0) {
+                        std::cout << "Erreur d'envoi des données au client front-end" << std::endl;
                     }
                 }
             }
