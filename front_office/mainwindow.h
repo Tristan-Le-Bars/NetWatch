@@ -19,5 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    int ConnectToServer();
+    int GetClients();
 };
 #endif // MAINWINDOW_H
