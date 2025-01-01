@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
@@ -25,12 +26,14 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QPushButton *pushButton;
+    QPushButton *test_button;
+    QWidget *horizontalLayoutWidget;
+    QHBoxLayout *mainLayout;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
     QWidget *widget;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *servers_layout;
-    QPushButton *test_button;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -43,26 +46,34 @@ public:
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName("pushButton");
         pushButton->setGeometry(QRect(30, 20, 80, 24));
-        scrollArea = new QScrollArea(centralwidget);
+        test_button = new QPushButton(centralwidget);
+        test_button->setObjectName("test_button");
+        test_button->setGeometry(QRect(130, 20, 80, 24));
+        horizontalLayoutWidget = new QWidget(centralwidget);
+        horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
+        horizontalLayoutWidget->setGeometry(QRect(20, 60, 631, 781));
+        mainLayout = new QHBoxLayout(horizontalLayoutWidget);
+        mainLayout->setObjectName("mainLayout");
+        mainLayout->setContentsMargins(0, 0, 0, 0);
+        scrollArea = new QScrollArea(horizontalLayoutWidget);
         scrollArea->setObjectName("scrollArea");
-        scrollArea->setGeometry(QRect(9, 79, 651, 781));
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 649, 779));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 627, 777));
         widget = new QWidget(scrollAreaWidgetContents);
         widget->setObjectName("widget");
         widget->setGeometry(QRect(0, 0, 651, 781));
         verticalLayoutWidget = new QWidget(widget);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(0, 0, 651, 781));
+        verticalLayoutWidget->setGeometry(QRect(0, 0, 631, 781));
         servers_layout = new QVBoxLayout(verticalLayoutWidget);
         servers_layout->setObjectName("servers_layout");
         servers_layout->setContentsMargins(0, 0, 0, 0);
         scrollArea->setWidget(scrollAreaWidgetContents);
-        test_button = new QPushButton(centralwidget);
-        test_button->setObjectName("test_button");
-        test_button->setGeometry(QRect(130, 20, 80, 24));
+
+        mainLayout->addWidget(scrollArea);
+
         MainWindow->setCentralWidget(centralwidget);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");

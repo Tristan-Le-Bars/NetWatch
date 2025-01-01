@@ -11,6 +11,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->scrollArea->setWidget(ui->scrollAreaWidgetContents);
+    ui->scrollArea->setWidgetResizable(true);
+    ui->mainLayout->addWidget(ui->scrollArea);
+    ui->scrollAreaWidgetContents->setLayout(ui->servers_layout);
+
     connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
 }
 

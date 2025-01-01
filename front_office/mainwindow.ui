@@ -27,50 +27,6 @@
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QScrollArea" name="scrollArea">
-    <property name="geometry">
-     <rect>
-      <x>9</x>
-      <y>79</y>
-      <width>651</width>
-      <height>781</height>
-     </rect>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <widget class="QWidget" name="scrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>649</width>
-       <height>779</height>
-      </rect>
-     </property>
-     <widget class="QWidget" name="widget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>651</width>
-        <height>781</height>
-       </rect>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>651</width>
-         <height>781</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="servers_layout"/>
-      </widget>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QPushButton" name="test_button">
     <property name="geometry">
      <rect>
@@ -83,6 +39,56 @@
     <property name="text">
      <string>test</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>631</width>
+      <height>781</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="mainLayout">
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>627</width>
+          <height>777</height>
+         </rect>
+        </property>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>651</width>
+           <height>781</height>
+          </rect>
+         </property>
+         <widget class="QWidget" name="verticalLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>631</width>
+            <height>781</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="servers_layout"/>
+         </widget>
+        </widget>
+       </widget>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

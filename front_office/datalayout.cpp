@@ -2,10 +2,12 @@
 #include "QChartView"
 
 DataLayout::DataLayout() {
-    QChartView *free_ram_chart_view = new QChartView(free_ram_chart);
-    QChartView *buffer_ram_chart_view = new QChartView(buffer_ram_chart);
-    QChartView *free_space_chart_view = new QChartView(free_space_chart);
-    QChartView *cpu_usage_chart_view = new QChartView(cpu_usage_chart);
+    QChartView *chart_view = new QChartView(chart);
+
+    free_ram_label->setText("free ram: ");
+    buffer_ram_label->setText("buffer ram: ");
+    free_space_label->setText("free space: ");
+    cpu_usage_label->setText("cpu usage: ");
 
     free_ram_hlayout->addWidget(free_ram_label);
     free_ram_hlayout->addWidget(free_ram_value);
@@ -27,16 +29,10 @@ DataLayout::DataLayout() {
     data_vlayout->addLayout(free_space_hlayout);
     data_vlayout->addLayout(cpu_usage_hlayout);
 
-    free_ram_chart_view->setRenderHint(QPainter::Antialiasing);
-    buffer_ram_chart_view->setRenderHint(QPainter::Antialiasing);
-    free_space_chart_view->setRenderHint(QPainter::Antialiasing);
-    cpu_usage_chart_view->setRenderHint(QPainter::Antialiasing);
+    chart_view->setRenderHint(QPainter::Antialiasing);
+    chart_view->setFixedSize(400, 200);
 
-    charts_vlayout->addWidget(free_ram_chart_view);
-    charts_vlayout->addWidget(buffer_ram_chart_view);
-    charts_vlayout->addWidget(free_space_chart_view);
-    charts_vlayout->addWidget(cpu_usage_chart_view);
-
+    charts_vlayout->addWidget(chart_view);
     main_hlayout->addLayout(data_vlayout);
     main_hlayout->addLayout(charts_vlayout);
     qDebug() << "test";
