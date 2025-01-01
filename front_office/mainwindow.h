@@ -22,5 +22,6 @@ private:
 
     int ConnectToServer();
     int GetClients();
+    int AddDataLayer();
 };
 #endif // MAINWINDOW_H

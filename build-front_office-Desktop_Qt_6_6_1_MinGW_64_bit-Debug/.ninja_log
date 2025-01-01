@@ -1,0 +1,9 @@
+# ninja log v5
+1	501	7573783488769149	front_office_autogen/timestamp	84f48df11869699c
+501	2493	7573783509350998	CMakeFiles/front_office.dir/front_office_autogen/mocs_compilation.cpp.obj	cdc23bbf8023a957
+508	2506	7573783509473957	CMakeFiles/front_office.dir/mainwindow.cpp.obj	187ab26ba517f5b6
+1	501	7573783488769149	front_office_autogen/mocs_compilation.cpp	84f48df11869699c
+1	501	7573783488769149	D:/projects/NetWatch/build-front_office-Desktop_Qt_6_6_1_MinGW_64_bit-Debug/front_office_autogen/timestamp	84f48df11869699c
+505	2498	7573783509402679	CMakeFiles/front_office.dir/main.cpp.obj	9dc9c2add663731f
+1	501	7573783488769149	D:/projects/NetWatch/build-front_office-Desktop_Qt_6_6_1_MinGW_64_bit-Debug/front_office_autogen/mocs_compilation.cpp	84f48df11869699c
+2506	3081	7573783515193024	front_office.exe	5308d1e10c895674

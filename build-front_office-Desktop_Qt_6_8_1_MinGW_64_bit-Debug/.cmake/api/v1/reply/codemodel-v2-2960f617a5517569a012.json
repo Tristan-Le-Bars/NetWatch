@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-4ea6fd5b95d8823cb302.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "front_office",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "front_office::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-front_office-Debug-960dc2c6b421216de757.json",
+					"name" : "front_office",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "front_office_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-front_office_autogen-Debug-41cb1c701ae0efffdd64.json",
+					"name" : "front_office_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "front_office_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-front_office_autogen_timestamp_deps-Debug-f8c087ba6f391e8f463d.json",
+					"name" : "front_office_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/projects/NetWatch/build-front_office-Desktop_Qt_6_8_1_MinGW_64_bit-Debug",
+		"source" : "D:/projects/NetWatch/front_office"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

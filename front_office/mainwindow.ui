@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>958</height>
+    <width>673</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,16 +27,62 @@
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
+   <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>60</y>
-      <width>401</width>
-      <height>401</height>
+      <x>9</x>
+      <y>79</y>
+      <width>651</width>
+      <height>781</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout"/>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>649</width>
+       <height>779</height>
+      </rect>
+     </property>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>651</width>
+        <height>781</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>651</width>
+         <height>781</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="servers_layout"/>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="test_button">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>test</string>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
