@@ -2,7 +2,7 @@
 #include "QVBoxLayout"
 #include "QLabel"
 #include "QLineEdit"
-#include "QChart"
+#include "QtCharts/QtCharts"
 #include <vector>
 
 #ifndef DATALAYOUT_H
