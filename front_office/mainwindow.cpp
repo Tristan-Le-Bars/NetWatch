@@ -35,8 +35,14 @@ int MainWindow::GetClients(){
 
 
 int MainWindow::AddDataLayer(){
-    DataLayout *layer = new DataLayout;
-    ui->servers_layout->addLayout(layer->main_hlayout);
+    QWidget *data_widget = new QWidget;
+    data_widget->setStyleSheet("background-color: #CBCACA;");
+
+    DataLayout *layer = new DataLayout(data_widget);
+    data_widget->setLayout(layer->main_hlayout); // Set the layout of data_widget
+
+    ui->servers_layout->addWidget(data_widget); // Add data_widget to the servers_layout
+
     return 0;
 }
 

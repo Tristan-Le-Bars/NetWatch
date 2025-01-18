@@ -4,46 +4,59 @@
 #include "QLineEdit"
 #include "QtCharts/QtCharts"
 #include <vector>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #ifndef DATALAYOUT_H
 #define DATALAYOUT_H
 
-class DataLayout {
+class DataLayout : public QWidget {
+    Q_OBJECT
     public:
-        DataLayout();
+        DataLayout(QWidget *parent = nullptr);
         ~DataLayout();
 
-        QHBoxLayout *main_hlayout = new QHBoxLayout;
+        QHBoxLayout *main_hlayout;
     private:
+        //QWidget *data_widget;
+        QVBoxLayout *data_vlayout;
+        QVBoxLayout *charts_vlayout;
+        QChart *cpu_chart;
+        QChart *ram_chart;
+        QChartView *cpu_chart_view;
+        QChartView *ram_chart_view;
 
-        QVBoxLayout *data_vlayout = new QVBoxLayout;
-        QVBoxLayout *charts_vlayout = new QVBoxLayout;
-        QChart *chart = new QChart;
-
-        QHBoxLayout *free_ram_hlayout = new QHBoxLayout;
-        QLabel *free_ram_label = new QLabel;
-        QLineEdit *free_ram_value = new QLineEdit;
-        QLineEdit *total_ram_value = new QLineEdit;
+        QHBoxLayout *free_ram_hlayout;
+        QLabel *free_ram_label;
+        QLineEdit *free_ram_value;
+        QLineEdit *total_ram_value;
         std::vector<std::string> free_ram_value_history;
 
 
-        QHBoxLayout *buffer_ram_hlayout = new QHBoxLayout;
-        QLabel *buffer_ram_label = new QLabel;
-        QLineEdit *buffer_ram_value = new QLineEdit;
-        QLineEdit *total_ram_value2 = new QLineEdit;
+        QHBoxLayout *buffer_ram_hlayout;
+        QLabel *buffer_ram_label;
+        QLineEdit *buffer_ram_value;
+        QLineEdit *total_ram_value2;
         std::vector<std::string> buffer_ram_value_history;
 
 
-        QHBoxLayout *free_space_hlayout = new QHBoxLayout;
-        QLabel *free_space_label = new QLabel;
-        QLineEdit *free_space_value = new QLineEdit;
-        QLineEdit *total_space_value = new QLineEdit;
+        QHBoxLayout *free_space_hlayout;
+        QLabel *free_space_label;
+        QLineEdit *free_space_value;
+        QLineEdit *total_space_value;
         std::vector<std::string> free_space_value_history;
 
-        QHBoxLayout *cpu_usage_hlayout = new QHBoxLayout;
-        QLabel *cpu_usage_label = new QLabel;
-        QLineEdit *cpu_usage_value = new QLineEdit;
+        QHBoxLayout *cpu_usage_hlayout;
+        QLabel *cpu_usage_label;
+        QLineEdit *cpu_usage_value;
         std::vector<std::string> cpu_usage_value_history;
+
+        int client_socket; // socket qui representera une connection entrante
+        int valread;
+        struct sockaddr_in server_address;
+        socklen_t server_addrlen = sizeof(server_address);
+        char client_ip[INET_ADDRSTRLEN];
+        char buffer[1024] = {0};
 };
 
 #endif // DATALAYOUT_H
