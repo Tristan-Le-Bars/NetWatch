@@ -18,7 +18,8 @@ class DataLayout : public QWidget {
 
         QHBoxLayout *main_hlayout;
     private:
-        //QWidget *data_widget;
+        QLabel *ip_adress;
+
         QVBoxLayout *data_vlayout;
         QVBoxLayout *charts_vlayout;
         QChart *cpu_chart;
@@ -28,27 +29,27 @@ class DataLayout : public QWidget {
 
         QHBoxLayout *free_ram_hlayout;
         QLabel *free_ram_label;
-        QLineEdit *free_ram_value;
-        QLineEdit *total_ram_value;
+        QLabel *free_ram_value;
+        QLabel *total_ram_value;
         std::vector<std::string> free_ram_value_history;
 
 
         QHBoxLayout *buffer_ram_hlayout;
         QLabel *buffer_ram_label;
-        QLineEdit *buffer_ram_value;
-        QLineEdit *total_ram_value2;
+        QLabel *buffer_ram_value;
+        QLabel *total_ram_value2;
         std::vector<std::string> buffer_ram_value_history;
 
 
         QHBoxLayout *free_space_hlayout;
         QLabel *free_space_label;
-        QLineEdit *free_space_value;
-        QLineEdit *total_space_value;
+        QLabel *free_space_value;
+        QLabel *total_space_value;
         std::vector<std::string> free_space_value_history;
 
         QHBoxLayout *cpu_usage_hlayout;
         QLabel *cpu_usage_label;
-        QLineEdit *cpu_usage_value;
+        QLabel *cpu_usage_value;
         std::vector<std::string> cpu_usage_value_history;
 
         int client_socket; // socket qui representera une connection entrante

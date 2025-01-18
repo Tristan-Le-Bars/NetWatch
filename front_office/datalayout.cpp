@@ -7,6 +7,8 @@ DataLayout::DataLayout(QWidget *parent)
 {
     main_hlayout = new QHBoxLayout;
 
+    ip_adress = new QLabel;
+
     //data_widget = new QWidget;
     data_vlayout = new QVBoxLayout;
     charts_vlayout = new QVBoxLayout;
@@ -15,23 +17,23 @@ DataLayout::DataLayout(QWidget *parent)
 
     free_ram_hlayout = new QHBoxLayout;
     free_ram_label = new QLabel;
-    free_ram_value = new QLineEdit;
-    total_ram_value = new QLineEdit;
+    free_ram_value = new QLabel;
+    total_ram_value = new QLabel;
 
 
     buffer_ram_hlayout = new QHBoxLayout;
     buffer_ram_label = new QLabel;
-    buffer_ram_value = new QLineEdit;
-    total_ram_value2 = new QLineEdit;
+    buffer_ram_value = new QLabel;
+    total_ram_value2 = new QLabel;
 
 
     free_space_hlayout = new QHBoxLayout;
     free_space_label = new QLabel;
-    free_space_value = new QLineEdit;
-    total_space_value = new QLineEdit;
+    free_space_value = new QLabel;
+    total_space_value = new QLabel;
     cpu_usage_hlayout = new QHBoxLayout;
     cpu_usage_label = new QLabel;
-    cpu_usage_value = new QLineEdit;
+    cpu_usage_value = new QLabel;
     cpu_chart_view = new QChartView(cpu_chart);
     ram_chart_view = new QChartView(ram_chart);
 
@@ -55,6 +57,7 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_usage_hlayout->addWidget(cpu_usage_label);
     cpu_usage_hlayout->addWidget(cpu_usage_value);
 
+    data_vlayout->addWidget(ip_adress);
     data_vlayout->addLayout(free_ram_hlayout);
     data_vlayout->addLayout(buffer_ram_hlayout);
     data_vlayout->addLayout(free_space_hlayout);
