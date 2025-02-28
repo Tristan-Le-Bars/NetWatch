@@ -185,6 +185,8 @@ int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
                 std::string response = "Machine resources data received";
                 send(client_socket, response.c_str(), response.size(), 0);
 
+                // ICI format le json pour tout envoyer d'un coup ?
+
                 // Send data to the admin front-end
                 // std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
                 std::cout << 'list of frontend sockets:' << std::endl;

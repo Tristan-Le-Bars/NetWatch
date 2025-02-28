@@ -3,6 +3,7 @@
 #include "QLabel"
 #include "QLineEdit"
 #include "datalayout.h"
+#include "serverconnection.h"
 #define PORT 9002
 
 MainWindow::MainWindow(QWidget *parent)
@@ -17,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->scrollAreaWidgetContents->setLayout(ui->servers_layout);
 
     connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
+
+    ServerConnection *conn = new ServerConnection();
 }
 
 MainWindow::~MainWindow()
