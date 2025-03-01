@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <unistd.h>
 
 #define PORT 9002
 
@@ -10,6 +11,9 @@ ServerConnection::ServerConnection()
 {
     if (EstablishConnection() != 0){
         std::cout << "Error while establishing connection." << std::endl;
+    }
+    else{
+        ReadFromServer();
     }
 }
 
@@ -38,3 +42,24 @@ int ServerConnection::EstablishConnection(){
     }
     return 0;
 }
+
+int ServerConnection::ReadFromServer(){
+    char buffer[1024] = {0};
+    int bytesRead;
+
+    while ((bytesRead = read(front_office_socket, buffer, sizeof(buffer))) > 0) {
+        std::string resourcesData(buffer, bytesRead);
+        std::cout << resourcesData << std::endl;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

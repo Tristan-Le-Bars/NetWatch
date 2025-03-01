@@ -14,6 +14,7 @@ private:
 
     int EstablishConnection();
 public:
+    int ReadFromServer();
     ServerConnection();
 };
 
