@@ -4,6 +4,9 @@
 #include "QLineEdit"
 #include "datalayout.h"
 #include "serverconnection.h"
+#include <thread>
+#include <iostream>
+
 #define PORT 9002
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,8 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->scrollAreaWidgetContents->setLayout(ui->servers_layout);
 
     connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
-
-    ServerConnection *conn = new ServerConnection();
+    connect(ui->connectButton, &QPushButton::clicked, this, &MainWindow::ConnectToServer);
 }
 
 MainWindow::~MainWindow()
@@ -28,6 +30,15 @@ MainWindow::~MainWindow()
 }
 
 int MainWindow::ConnectToServer(){
+    ServerConnection *conn = new ServerConnection();
+    if (conn->EstablishConnection() != 0){
+        std::cout << "Error while establishing connection." << std::endl;
+        return -1;
+    }
+    else{
+        std::thread reader_thread(&ServerConnection::ReadFromServer, conn);
+        reader_thread.detach();
+    }
     return 0;
 }
 

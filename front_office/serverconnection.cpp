@@ -9,12 +9,6 @@
 
 ServerConnection::ServerConnection()
 {
-    if (EstablishConnection() != 0){
-        std::cout << "Error while establishing connection." << std::endl;
-    }
-    else{
-        ReadFromServer();
-    }
 }
 
 int ServerConnection::EstablishConnection(){

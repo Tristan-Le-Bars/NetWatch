@@ -10,10 +10,9 @@ private:
     int front_office_socket;
     struct sockaddr_in server_address;
     socklen_t server_addrlen = sizeof(server_address);
-    char client_ip[INET_ADDRSTRLEN];
-
-    int EstablishConnection();
+    char client_ip[INET_ADDRSTRLEN];    
 public:
+    int EstablishConnection();
     int ReadFromServer();
     ServerConnection();
 };

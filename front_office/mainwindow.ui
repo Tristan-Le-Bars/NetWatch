@@ -17,7 +17,7 @@
    <string notr="true">background-color: #7B7B7A;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="connectButton">
     <property name="geometry">
      <rect>
       <x>30</x>
