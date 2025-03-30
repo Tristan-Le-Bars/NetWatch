@@ -7,7 +7,9 @@
 
 
 
-MachineResources::MachineResources(std::string id){
+MachineResources::MachineResources(std::string id)
+: client_id(id), user(0), nice(0), system(0), idle(0), iowait(0), irq(0), softirq(0),
+total1(0), total2(0), total_idle(0), cpu_usage(0.0) {
     // std::lock_guard<std::mutex> lock(resourceMutex);
     // Open /proc/stat
     // setId();
@@ -83,24 +85,35 @@ void MachineResources::getRAMUsage(){
     // cached_ram_mb = info.cachedram / (1024 * 1024); // Convert bytes to MB
 }
 
-void MachineResources::getCPUUsage(){
+void MachineResources::getCPUUsage() {
     std::lock_guard<std::mutex> lock(resourceMutex);
+
     // Read the stats again
     setProcStat();
-    fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
-            &user, &nice, &system, &idle, &iowait, &irq, &softirq);
-    fclose(proc_stat);
+    if (proc_stat) {
+        if (fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
+                   &user, &nice, &system, &idle, &iowait, &irq, &softirq) == 7) {
+            fclose(proc_stat);
 
-    // Calculate total and idle time again
-    total2 = user + nice + system + idle + iowait + irq + softirq;
-    total_idle += (idle + iowait);
+            // Calculate total and idle time again
+            total2 = user + nice + system + idle + iowait + irq + softirq;
+            unsigned long long idle2 = idle + iowait;
 
-    // Calculate CPU usage
-    cpu_usage = 100 * (1 - (double)(total_idle - (idle + iowait)) / (total2 - total1));
+            // Calculate CPU usage
+            if (total2 != total1) {
+                cpu_usage = 100.0 * (1.0 - (double)(idle2 - total_idle) / (total2 - total1));
+            } else {
+                cpu_usage = 0.0;
+            }
 
-    // Print CPU usage
-    // printf("CPU Usage: %llu%%\n", cpu_usage);
-    total1 = total2;
+
+            total1 = total2;
+            total_idle = idle2; // Mettre à jour total_idle avec la nouvelle valeur
+        } else {
+            std::cerr << "Failed to read CPU stats from /proc/stat" << std::endl;
+            fclose(proc_stat);
+        }
+    }
 }
 
 std::string MachineResources::getFormattedData(){

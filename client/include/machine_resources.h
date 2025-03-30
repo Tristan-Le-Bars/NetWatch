@@ -37,7 +37,8 @@ class MachineResources {
 
         FILE *proc_stat;
         unsigned long long int user, nice, system, idle, iowait, irq, softirq, total1, total2;
-        unsigned long long int total_idle, total, cpu_usage;
+        unsigned long long int total_idle, total;
+        double cpu_usage;
 
         int setSysinfo();
         int setStatvfs();
