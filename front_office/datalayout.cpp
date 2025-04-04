@@ -81,3 +81,33 @@ DataLayout::~DataLayout()
 {
 
 }
+
+int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage){
+    QString buffer_qstring;
+
+    buffer_qstring = QString::number(free_ram, 'f', 4);
+    free_ram_value->setText(buffer_qstring);
+
+    buffer_qstring = QString::number(total_ram, 'f', 4);
+    total_ram_value->setText(buffer_qstring);
+
+    buffer_qstring = QString::number(buffer_ram, 'f', 4);
+    buffer_ram_value->setText(buffer_qstring);
+
+    buffer_qstring = QString::number(free_space, 'f', 4);
+    free_space_value->setText(buffer_qstring);
+
+    buffer_qstring = QString::number(total_space, 'f', 4);
+    total_space_value->setText(buffer_qstring);
+
+    buffer_qstring = QString::number(cpu_usage, 'f', 4);
+    cpu_usage_value->setText(buffer_qstring);
+
+    return 0;
+}
+
+int DataLayout::DrawCharts(){
+    // convert vectors to LineSeries
+    //draw chart
+    return 0;
+}

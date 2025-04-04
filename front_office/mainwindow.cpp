@@ -38,6 +38,10 @@ int MainWindow::ConnectToServer(){
     else{
         std::thread reader_thread(&ServerConnection::ReadFromServer, conn);
         reader_thread.detach();
+        //std::thread display_thread(&ServerConnection::DisplayClientsData, conn);
+        //reader_thread.detach();
+
+        //AddDataLayer();
     }
     return 0;
 }
