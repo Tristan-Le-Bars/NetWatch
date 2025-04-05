@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "QLabel"
 #include "QLineEdit"
+#include "QThread"
 #include "datalayout.h"
 #include "serverconnection.h"
 #include <thread>
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mainLayout->addWidget(ui->scrollArea);
     ui->scrollAreaWidgetContents->setLayout(ui->servers_layout);
 
-    connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
+    //connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
     connect(ui->connectButton, &QPushButton::clicked, this, &MainWindow::ConnectToServer);
 }
 
@@ -31,18 +32,20 @@ MainWindow::~MainWindow()
 
 int MainWindow::ConnectToServer(){
     ServerConnection *conn = new ServerConnection();
-    if (conn->EstablishConnection() != 0){
-        std::cout << "Error while establishing connection." << std::endl;
-        return -1;
-    }
-    else{
-        std::thread reader_thread(&ServerConnection::ReadFromServer, conn);
-        reader_thread.detach();
-        //std::thread display_thread(&ServerConnection::DisplayClientsData, conn);
-        //reader_thread.detach();
+    conn->EstablishConnection();
+    serverThread = new QThread(this);
 
-        //AddDataLayer();
-    }
+    // Déplacer le ServerConnection dans un thread séparé
+    
+    connect(serverThread, &QThread::started, conn, &ServerConnection::ReadFromServer);
+    connect(conn, &ServerConnection::dataReceived, this, &MainWindow::handleDataReceived);
+    connect(conn, &ServerConnection::addDataLayerRequested, this, &MainWindow::AddDataLayer);
+    //connect(conn, &ServerConnection::finished, serverThread, &QThread::quit);
+    connect(serverThread, &QThread::finished, serverThread, &QThread::deleteLater);
+    
+    conn->moveToThread(serverThread);
+
+    serverThread->start();  // Démarre le thread
     return 0;
 }
 
@@ -52,7 +55,8 @@ int MainWindow::GetClients(){
 }
 
 
-int MainWindow::AddDataLayer(){
+int MainWindow::AddDataLayer(const QString& client_id){
+    
     QWidget *data_widget = new QWidget;
     data_widget->setStyleSheet("background-color: #CBCACA;");
 
@@ -60,10 +64,17 @@ int MainWindow::AddDataLayer(){
     data_widget->setLayout(layer->main_hlayout); // Set the layout of data_widget
 
     ui->servers_layout->addWidget(data_widget); // Add data_widget to the servers_layout
-
+    datalayout_map[client_id.toStdString()] = layer;
     return 0;
 }
 
+int MainWindow::handleDataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage) {
+    // Mettre à jour l'UI avec les données reçues
+    std::cout << "handle data recieved" << std::endl;
+    datalayout_map[client_id.toStdString()]->SetLabels( free_ram,  total_ram,  buffer_ram,  total_space,  free_space,  cpu_usage);
+    std::cout << "Data received for " << client_id.toStdString() << std::endl;
+    return 0;
+}
 
 
 

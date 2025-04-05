@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <map>
 #include "datalayout.h"
+#include "serverconnection.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,15 +21,19 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
     private:
-        Ui::MainWindow *ui;
-
-        int ConnectToServer();
         int GetClients();
 
-        std::map<std::string, DataLayout> datalayout_map;
+        std::map<std::string, DataLayout*> datalayout_map;
+        Ui::MainWindow *ui;
+        QThread *serverThread;
+        //ServerConnection *conn;
 
     public slots:
-        int AddDataLayer();
+        int AddDataLayer(const QString& client_id);
+        int handleDataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage);
+
+    private slots:
+        int ConnectToServer();
 
 };
 #endif // MAINWINDOW_H

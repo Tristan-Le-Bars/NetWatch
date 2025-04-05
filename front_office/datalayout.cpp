@@ -73,8 +73,6 @@ DataLayout::DataLayout(QWidget *parent)
     charts_vlayout->addWidget(ram_chart_view);
     main_hlayout->addLayout(data_vlayout);
     main_hlayout->addLayout(charts_vlayout);
-
-    qDebug() << "test";
 }
 
 DataLayout::~DataLayout()

@@ -131,9 +131,9 @@ std::string MachineResources::getFormattedData(){
     std::string cpu_usage_str = std::to_string(cpu_usage);
 
   
-       formated_data = "{\n   \"datatype\":"  + datatype + ",\n" +
-                    "   \"client_id\":" + client_id + ",\n"
-                    "   \"resources\": {"  + "\n" +
+    formated_data = "{\n   \"datatype\": \"" + datatype + "\",\n" +
+                    "   \"client_id\": \"" + client_id + "\",\n"
+                    "   \"resources\": {\n" +
                     "       \"total_ram\": " + total_ram_str + ",\n" +
                     "       \"free_ram\": " + free_ram_str + ",\n" +
                     "       \"buffer_ram\": " + buffer_ram_str + ",\n" +
@@ -141,9 +141,9 @@ std::string MachineResources::getFormattedData(){
                     "       \"free_space\": " + free_space_str + ",\n" +
                     "       \"available_space\": " + available_space_str + ",\n" +
                     "       \"cpu_usage\": " + cpu_usage_str + "\n" +
-                    "   }\n" +
+                    "   }\n"
                     "}";
-
+    // std::cout << formated_data << std::endl;
     return formated_data;
 }
 

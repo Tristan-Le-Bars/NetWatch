@@ -10,31 +10,38 @@
 #include <set>
 
 #include "datalayout.h"
+#include "mainwindow.h"
 
-class ServerConnection
+class ServerConnection : public QObject
 {
-private:
-    int front_office_socket;
-    struct sockaddr_in server_address;
-    socklen_t server_addrlen = sizeof(server_address);
-    char client_ip[INET_ADDRSTRLEN];
-    double extractDouble(const std::string& json, const std::string& key);
-    std::string extractString(const std::string& json, const std::string& key);
+    Q_OBJECT
+    private:
+        int front_office_socket;
+        struct sockaddr_in server_address;
+        socklen_t server_addrlen = sizeof(server_address);
+        char client_ip[INET_ADDRSTRLEN];
+        double extractDouble(const std::string& json, const std::string& key);
+        std::string extractString(const std::string& json, const std::string& key);
 
-    std::map<std::string, std::deque<double>> total_ram_map;
-    std::map<std::string, std::deque<double>> free_ram_map;
-    std::map<std::string, std::deque<double>> buffer_ram_map;
-    std::map<std::string, std::deque<double>> total_space_map;
-    std::map<std::string, std::deque<double>> free_space_map;
-    std::map<std::string, std::deque<double>> available_space_map;
-    std::map<std::string, std::deque<double>> cpu_usage_map;
-public:
-    std::vector<std::string> recieved_clients_id;
-    std::map<std::string, DataLayout> datalayout_map;
-    int EstablishConnection();
-    int ReadFromServer();
-    int DisplayClientsData();
-    ServerConnection();
+        std::map<std::string, std::deque<double>> total_ram_map;
+        std::map<std::string, std::deque<double>> free_ram_map;
+        std::map<std::string, std::deque<double>> buffer_ram_map;
+        std::map<std::string, std::deque<double>> total_space_map;
+        std::map<std::string, std::deque<double>> free_space_map;
+        std::map<std::string, std::deque<double>> available_space_map;
+        std::map<std::string, std::deque<double>> cpu_usage_map;
+    public:
+        ServerConnection();
+        std::vector<std::string> recieved_clients_id;
+        std::map<std::string, DataLayout> datalayout_map;
+        int EstablishConnection();
+        int ReadFromServer();
+        int DisplayClientsData();
+        void run();  // Fonction exécutée par le QThread
+    
+    signals:
+        void dataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage);
+        void addDataLayerRequested(const QString& client_id);
 };
 
 #endif // SERVERCONNECTION_H
