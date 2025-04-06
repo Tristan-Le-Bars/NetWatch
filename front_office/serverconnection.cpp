@@ -95,36 +95,7 @@ int ServerConnection::ReadFromServer(){
     return 0;
 }
 
-// int ServerConnection::DisplayClientsData(){
-//     qDebug() << "recieved_clients_id.size() = " << recieved_clients_id.size();
-//     for (int i = 0; i < recieved_clients_id.size();i++){
-//         std::string keyToFind = recieved_clients_id[i];
-//         qDebug() << "keyToFind = " << keyToFind;
-//         if (datalayout_map.find(keyToFind) == datalayout_map.end()) {
-//             qDebug() << "create the data widget";
-//             QWidget *data_widget = new QWidget;
-//             data_widget->setStyleSheet("background-color: #CBCACA;");
-            
-//             DataLayout *layer = new DataLayout(data_widget);
-//             data_widget->setLayout(layer->main_hlayout); // Set the layout of data_widget
 
-//             mainwindow_ptr->ui->servers_layout->addWidget(data_widget); // Add data_widget to the servers_layout
-//         }
-//     }
-
-//     qDebug() << "recieved_clients_id.size() = " << recieved_clients_id.size();
-//     for (int i = 0; i < recieved_clients_id.size();i++){
-//         qDebug() << "recieved_clients_id[" << i << "] = " << recieved_clients_id[i];
-//         datalayout_map[recieved_clients_id[i]].SetLabels(free_ram_map[recieved_clients_id[i]].back(),
-//                                                         total_ram_map[recieved_clients_id[i]].back(),
-//                                                         buffer_ram_map[recieved_clients_id[i]].back(),
-//                                                         free_space_map[recieved_clients_id[i]].back(),
-//                                                         total_space_map[recieved_clients_id[i]].back(),
-//                                                         cpu_usage_map[recieved_clients_id[i]].back());
-
-//         //datalayout_map[recieved_clients_id[i]].DrawCharts() // ICI faire la fonction 
-//     }
-// }
 
 // Fonction pour extraire une valeur de type double entre guillemets
 double ServerConnection::extractDouble(const std::string& json, const std::string& key) {

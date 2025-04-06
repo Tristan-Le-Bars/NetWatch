@@ -26,10 +26,14 @@ class DataLayout : public QWidget {
 
         QVBoxLayout *data_vlayout;
         QVBoxLayout *charts_vlayout;
+        
         QChart *cpu_chart;
         QChart *ram_chart;
+        QChart *storage_chart;
+
         QChartView *cpu_chart_view;
         QChartView *ram_chart_view;
+        QChartView *storage_chart_view;
 
         QHBoxLayout *free_ram_hlayout;
         QLabel *free_ram_label;
