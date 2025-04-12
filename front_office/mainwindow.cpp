@@ -56,15 +56,14 @@ int MainWindow::GetClients(){
 
 
 int MainWindow::AddDataLayer(const QString& client_id){
-    
+    std::cout << "call AddDataLayer" << std::endl;
     QWidget *data_widget = new QWidget;
     data_widget->setStyleSheet("background-color: #CBCACA;");
-
     DataLayout *layer = new DataLayout(data_widget);
     data_widget->setLayout(layer->main_hlayout); // Set the layout of data_widget
-
     ui->servers_layout->addWidget(data_widget); // Add data_widget to the servers_layout
     datalayout_map[client_id.toStdString()] = layer;
+    std::cout << "new data layout created" << std::endl;
     return 0;
 }
 
