@@ -6,6 +6,7 @@
 #include <vector>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <deque>
 
 #ifndef DATALAYOUT_H
 #define DATALAYOUT_H
@@ -15,7 +16,7 @@ class DataLayout : public QWidget {
     public:
         DataLayout(QWidget *parent = nullptr);
         ~DataLayout();
-        int DrawCharts();
+        int DrawCharts(std::deque<double> free_ram_deque, std::deque<double> free_space_deque, std::deque<double> cpu_usage_deque);
 
         int SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage);
 
@@ -30,6 +31,10 @@ class DataLayout : public QWidget {
         QChart *cpu_chart;
         QChart *ram_chart;
         QChart *storage_chart;
+
+        QLineSeries free_ram_series;
+        QLineSeries free_space_series;
+        QLineSeries cpu_usage_series;
 
         QChartView *cpu_chart_view;
         QChartView *ram_chart_view;

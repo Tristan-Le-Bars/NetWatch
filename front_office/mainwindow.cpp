@@ -31,7 +31,8 @@ MainWindow::~MainWindow()
 }
 
 int MainWindow::ConnectToServer(){
-    ServerConnection *conn = new ServerConnection();
+    std::string address_text = ui->address_edit->toPlainText().toStdString();
+    ServerConnection *conn = new ServerConnection(address_text);
     conn->EstablishConnection();
     serverThread = new QThread(this);
 

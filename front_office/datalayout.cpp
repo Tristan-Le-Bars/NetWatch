@@ -1,6 +1,7 @@
 #include "datalayout.h"
 #include "QChartView"
 #include "iostream"
+#include <deque>
 
 DataLayout::DataLayout(QWidget *parent)
     : QWidget(parent)
@@ -86,6 +87,12 @@ DataLayout::DataLayout(QWidget *parent)
     // data_vlayout->addLayout(buffer_ram_hlayout);
     main_hlayout->addLayout(data_vlayout);
     main_hlayout->addLayout(charts_vlayout);
+
+
+    ram_chart->addSeries(&free_ram_series);
+    cpu_chart->addSeries(&cpu_usage_series);
+    storage_chart->addSeries(&free_space_series);
+
     std::cout << "datalayout initialized" << std::endl;
 }
 
@@ -95,7 +102,6 @@ DataLayout::~DataLayout()
 }
 
 int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage){
-    std::cout << "call SetLabels" << std::endl;
     QString buffer_qstring;
 
     buffer_qstring = QString::number(free_ram, 'f', 4);
@@ -120,8 +126,31 @@ int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, 
     return 0;
 }
 
-int DataLayout::DrawCharts(){
+int DataLayout::DrawCharts(std::deque<double> free_ram_deque, std::deque<double> free_space_deque, std::deque<double> cpu_usage_deque){
     // convert vectors to LineSeries
+    
+    for (size_t i = 0; i < free_ram_deque.size(); ++i) {
+        double ram_x = static_cast<double>(i);
+        double ram_y = free_ram_deque[i];
+
+        double space_x = static_cast<double>(i);
+        double space_y = free_space_deque[i];
+
+        double cpu_x = static_cast<double>(i);
+        double cpu_y = cpu_usage_deque[i];
+        
+        free_ram_series.append(ram_x, ram_y);
+        free_space_series.append(space_x, space_y);
+        cpu_usage_series.append(cpu_x, cpu_y);
+    }
+
+    cpu_chart_view->update();
+    ram_chart_view->update();
+    storage_chart_view->update();
+
+    // ram_chart->addSeries(&free_ram_series);
+    // cpu_chart->addSeries(&cpu_usage_series);
+    // storage_chart->addSeries(&free_space_series);
     //draw chart
     return 0;
 }

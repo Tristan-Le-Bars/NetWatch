@@ -9,8 +9,8 @@
 
 #define PORT 9002
 
-ServerConnection::ServerConnection()
-{
+ServerConnection::ServerConnection(std::string address_text_){
+    address_text = address_text_;
 }
 
 int ServerConnection::EstablishConnection(){
@@ -26,7 +26,7 @@ int ServerConnection::EstablishConnection(){
     server_address.sin_port = htons(PORT);
 
     // convertie l'addresse au format binaire
-    if (inet_pton(AF_INET, "0.0.0.0", &server_address.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, address_text.c_str(), &server_address.sin_addr) <= 0) {
         qDebug() << "Invalid address/ Address not supported";
         return -1;
     }

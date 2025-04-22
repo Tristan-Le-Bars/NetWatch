@@ -16,6 +16,7 @@ class ServerConnection : public QObject
 {
     Q_OBJECT
     private:
+        std::string address_text;
         int front_office_socket;
         struct sockaddr_in server_address;
         socklen_t server_addrlen = sizeof(server_address);
@@ -31,7 +32,7 @@ class ServerConnection : public QObject
         std::map<std::string, std::deque<double>> available_space_map;
         std::map<std::string, std::deque<double>> cpu_usage_map;
     public:
-        ServerConnection();
+        ServerConnection(std::string address_text_);
         std::vector<std::string> recieved_clients_id;
         std::map<std::string, DataLayout> datalayout_map;
         int EstablishConnection();
