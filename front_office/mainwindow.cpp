@@ -33,18 +33,22 @@ MainWindow::~MainWindow()
 int MainWindow::ConnectToServer(){
     std::string address_text = ui->address_edit->toPlainText().toStdString();
     ServerConnection *conn = new ServerConnection(address_text);
-    conn->EstablishConnection();
     serverThread = new QThread(this);
+
+    connections_map[address_text] = conn;
+    connection_threads_map[address_text] = serverThread;
+
+    conn->EstablishConnection();
 
     // Déplacer le ServerConnection dans un thread séparé
     
-    connect(serverThread, &QThread::started, conn, &ServerConnection::ReadFromServer);
-    connect(conn, &ServerConnection::dataReceived, this, &MainWindow::handleDataReceived);
-    connect(conn, &ServerConnection::addDataLayerRequested, this, &MainWindow::AddDataLayer);
+    std::cout << "read from server connection: " << connect(serverThread, &QThread::started, connections_map[address_text], &ServerConnection::ReadFromServer) << std::endl;
+    std::cout << "add data layer connection: " << connect(connections_map[address_text], &ServerConnection::addDataLayerRequested, this, &MainWindow::AddDataLayer, Qt::QueuedConnection) << std::endl;
+    std::cout << "handle data recieved connection: " << connect(connections_map[address_text], &ServerConnection::dataReceived, this, &MainWindow::handleDataReceived, Qt::QueuedConnection) << std::endl;
     //connect(conn, &ServerConnection::finished, serverThread, &QThread::quit);
-    connect(serverThread, &QThread::finished, serverThread, &QThread::deleteLater);
+    std::cout << "delete later connection: " << connect(serverThread, &QThread::finished, serverThread, &QThread::deleteLater) << std::endl;
     
-    conn->moveToThread(serverThread);
+    connections_map[address_text]->moveToThread(serverThread);
 
     serverThread->start();  // Démarre le thread
     return 0;
@@ -68,11 +72,15 @@ int MainWindow::AddDataLayer(const QString& client_id){
     return 0;
 }
 
-int MainWindow::handleDataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage) {
-    // Mettre à jour l'UI avec les données reçues
+int MainWindow::handleDataReceived(QString client_id, double total_ram, double buffer_ram, double total_space, double free_ram, double free_space, double cpu_usage){
     std::cout << "handle data recieved" << std::endl;
+    std::cout << "free ram in handleDataReceived  = " << free_ram;
+    std::cout << "free space in handleDataReceived  = " << free_space;
+    std::cout << "cpu usage  in handleDataReceived  = " << cpu_usage;
     datalayout_map[client_id.toStdString()]->SetLabels( free_ram,  total_ram,  buffer_ram,  total_space,  free_space,  cpu_usage);
     std::cout << "Data received for " << client_id.toStdString() << std::endl;
+    datalayout_map[client_id.toStdString()]->updateDataDeque(free_ram, free_space, cpu_usage);
+    datalayout_map[client_id.toStdString()]->DrawCharts();
     return 0;
 }
 

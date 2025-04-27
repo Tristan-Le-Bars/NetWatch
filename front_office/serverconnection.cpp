@@ -66,7 +66,6 @@ int ServerConnection::ReadFromServer(){
         free_space = extractDouble(resourcesData, "\"free_space\": ");
         available_space = extractDouble(resourcesData, "\"available_space\": ");
         cpu_usage = extractDouble(resourcesData, "\"cpu_usage\": ");
-        std::cout << "cpu usage before before emit = " << cpu_usage << std::endl;
 
         std::cout << "extraction done" << std::endl;
 
@@ -95,7 +94,12 @@ int ServerConnection::ReadFromServer(){
             emit addDataLayerRequested(QString::fromStdString(client_id));
         }
         std::cout << "cpu usage before emit = " << cpu_usage << std::endl;
-        emit dataReceived(QString::fromStdString(client_id), free_ram, total_ram, buffer_ram, total_space, free_space, cpu_usage);
+        for (const auto& element : free_ram_map[client_id]) {
+            std::cout << element << " ";
+        }
+        std::cout << std::endl;
+        emit dataReceived(QString::fromStdString(client_id), total_ram, buffer_ram, total_space, free_ram_map[client_id].back(), free_space_map[client_id].back(), cpu_usage_map[client_id].back());
+        std::cout << "emit done ?" << std::endl;
     }
     return 0;
 }

@@ -16,13 +16,31 @@ class DataLayout : public QWidget {
     public:
         DataLayout(QWidget *parent = nullptr);
         ~DataLayout();
-        int DrawCharts(std::deque<double> free_ram_deque, std::deque<double> free_space_deque, std::deque<double> cpu_usage_deque);
+        int DrawCharts();
 
         int SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage);
 
         QHBoxLayout *main_hlayout;
+        
+        void updateDataDeque(double free_ram, double free_space, double cpu_usage){
+            free_ram_deque.push_back(free_ram);
+            free_space_deque.push_back(free_space);
+            cpu_usage_deque.push_back(cpu_usage);
+    
+            if (free_ram_deque.size() > 15){
+                free_ram_deque.pop_front();
+                free_space_deque.pop_front();
+                cpu_usage_deque.pop_front();
+            }
+        }
     private:
         std::string client_id;
+
+        std::deque<double> free_ram_deque;
+        std::deque<double> free_space_deque;
+        std::deque<double> cpu_usage_deque;
+
+
         QLabel *ip_adress;
 
         QVBoxLayout *data_vlayout;

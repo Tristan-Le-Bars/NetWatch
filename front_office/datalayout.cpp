@@ -17,6 +17,9 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_chart = new QChart;
     ram_chart = new QChart;
     storage_chart = new QChart;
+//    cpu_chart->legend()->setVisible(false);
+//    ram_chart->legend()->setVisible(false);
+//    storage_chart->legend()->setVisible(false);
     free_ram_hlayout = new QHBoxLayout;
     free_ram_label = new QLabel;
     free_ram_value = new QLabel;
@@ -53,13 +56,13 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_usage_label->setText("cpu usage: ");
     
     cpu_chart_view->setRenderHint(QPainter::Antialiasing);
-    cpu_chart_view->setFixedSize(400, 100);
+    cpu_chart_view->setFixedSize(400, 400);
 
     ram_chart_view->setRenderHint(QPainter::Antialiasing);
-    ram_chart_view->setFixedSize(400, 100);
+    ram_chart_view->setFixedSize(400, 400);
 
     storage_chart_view->setRenderHint(QPainter::Antialiasing);
-    storage_chart_view->setFixedSize(400, 100);
+    storage_chart_view->setFixedSize(400, 400);
     cpu_usage_hlayout->addWidget(cpu_usage_label);
     cpu_usage_hlayout->addWidget(cpu_usage_value);
     cpu_usage_hlayout->addWidget(cpu_chart_view);
@@ -126,7 +129,7 @@ int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, 
     return 0;
 }
 
-int DataLayout::DrawCharts(std::deque<double> free_ram_deque, std::deque<double> free_space_deque, std::deque<double> cpu_usage_deque){
+int DataLayout::DrawCharts(){
     // convert vectors to LineSeries
     
     for (size_t i = 0; i < free_ram_deque.size(); ++i) {
@@ -148,9 +151,9 @@ int DataLayout::DrawCharts(std::deque<double> free_ram_deque, std::deque<double>
     ram_chart_view->update();
     storage_chart_view->update();
 
-    // ram_chart->addSeries(&free_ram_series);
-    // cpu_chart->addSeries(&cpu_usage_series);
-    // storage_chart->addSeries(&free_space_series);
+//     ram_chart->addSeries(&free_ram_series);
+//     cpu_chart->addSeries(&cpu_usage_series);
+//     storage_chart->addSeries(&free_space_series);
     //draw chart
     return 0;
 }

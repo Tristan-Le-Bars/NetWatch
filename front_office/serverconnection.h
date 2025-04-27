@@ -10,7 +10,7 @@
 #include <set>
 
 #include "datalayout.h"
-#include "mainwindow.h"
+//#include "mainwindow.h"
 
 class ServerConnection : public QObject
 {
@@ -33,15 +33,14 @@ class ServerConnection : public QObject
         std::map<std::string, std::deque<double>> cpu_usage_map;
     public:
         ServerConnection(std::string address_text_);
+        ~ServerConnection(){};
         std::vector<std::string> recieved_clients_id;
         std::map<std::string, DataLayout> datalayout_map;
         int EstablishConnection();
         int ReadFromServer();
-        int DisplayClientsData();
-        void run();  // Fonction exécutée par le QThread
     
     signals:
-        void dataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage);
+        void dataReceived(QString client_id , double total_ram, double buffer_ram, double total_space, double free_ram, double free_space, double cpu_usage);
         void addDataLayerRequested(const QString& client_id);
 };
 

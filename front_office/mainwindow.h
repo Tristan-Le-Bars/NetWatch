@@ -5,6 +5,7 @@
 #include <map>
 #include "datalayout.h"
 #include "serverconnection.h"
+#include <string>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,12 +27,14 @@ class MainWindow : public QMainWindow
         std::map<std::string, DataLayout*> datalayout_map;
         Ui::MainWindow *ui;
         QThread *serverThread;
+        std::map<std::string, ServerConnection*> connections_map;
+        std::map<std::string, QThread*> connection_threads_map;
         //ServerConnection *conn;
 
     public slots:
         int AddDataLayer(const QString& client_id);
-        int handleDataReceived(const QString& client_id, double free_ram, double total_ram, double buffer_ram, double total_space, double free_space, double cpu_usage);
-
+        int handleDataReceived(QString client_id, double total_ram, double buffer_ram, double total_space, double free_ram, double free_space, double cpu_usage);
+        
     private slots:
         int ConnectToServer();
 
