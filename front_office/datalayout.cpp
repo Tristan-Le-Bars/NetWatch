@@ -76,8 +76,8 @@ DataLayout::DataLayout(QWidget *parent)
     free_ram_hlayout->addWidget(ram_chart_view);
 
     free_space_hlayout->addWidget(free_space_label);
-    free_space_hlayout->addWidget(total_space_value);
     free_space_hlayout->addWidget(free_space_value);
+    free_space_hlayout->addWidget(total_space_value);
     free_space_hlayout->addWidget(storage_chart_view);
 
     data_vlayout->setSpacing(10);
@@ -102,6 +102,7 @@ DataLayout::DataLayout(QWidget *parent)
     axisY_cpu->setRange(0, 100);
     cpu_chart->addAxis(axisX_cpu, Qt::AlignBottom);
     cpu_chart->addAxis(axisY_cpu, Qt::AlignLeft);
+    axisX_cpu->setVisible(false);
     cpu_usage_series.attachAxis(axisX_cpu);
 
     QValueAxis *axisX_ram = new QValueAxis();
@@ -110,6 +111,7 @@ DataLayout::DataLayout(QWidget *parent)
     axisY_ram->setRange(0, 100);
     ram_chart->addAxis(axisX_ram, Qt::AlignBottom);
     ram_chart->addAxis(axisY_ram, Qt::AlignLeft);
+    axisX_ram->setVisible(false);
     free_ram_series.attachAxis(axisX_ram);
 
     QValueAxis *axisX_storage = new QValueAxis();
@@ -119,6 +121,8 @@ DataLayout::DataLayout(QWidget *parent)
     storage_chart->addAxis(axisX_storage, Qt::AlignBottom);
     storage_chart->addAxis(axisY_storage, Qt::AlignLeft);
     free_space_series.attachAxis(axisX_storage);
+    free_space_series.attachAxis(axisY_storage);
+    axisX_storage->setVisible(false);
     std::cout << "datalayout initialized" << std::endl;
 }
 
@@ -139,13 +143,12 @@ int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, 
     buffer_qstring = QString::number(buffer_ram, 'f', 4);
     buffer_ram_value->setText(buffer_qstring);
 
-    buffer_qstring = QString::number(total_space - free_space, 'f', 4);
+    buffer_qstring = QString::number(free_space, 'f', 4);
     free_space_value->setText(buffer_qstring);
 
     buffer_qstring = QString::number(total_space, 'f', 4);
     total_space_value->setText(buffer_qstring);
 
-    std::cout << "cpu_usage in setlabels = " << cpu_usage << std::endl;
     buffer_qstring = QString::number(cpu_usage, 'f', 4);
     cpu_usage_value->setText(buffer_qstring);
 
@@ -169,7 +172,7 @@ int DataLayout::DrawCharts(){
         double ram_y = (total_ram - free_ram_deque[i]) * 0.1;
 
         double space_x = static_cast<double>(i);
-        double space_y =  (total_space - free_space_deque[i]);
+        double space_y =  free_space_deque[i];
 
         double cpu_x = static_cast<double>(i);
         double cpu_y = cpu_usage_deque[i] * 0.01;
@@ -179,6 +182,9 @@ int DataLayout::DrawCharts(){
         cpu_usage_series.append(cpu_x, cpu_y);
     }
 
+    for (const QPointF& point : free_space_series.points()) {
+            qDebug() << "Point : (" << point.x() << ", " << point.y() << ")";
+        }
 
     cpu_chart_view->update();
     ram_chart_view->update();

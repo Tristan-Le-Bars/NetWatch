@@ -77,7 +77,7 @@ int MainWindow::handleDataReceived(QString client_id, double total_ram, double b
     std::cout << "free ram in handleDataReceived  = " << free_ram;
     std::cout << "free space in handleDataReceived  = " << free_space;
     std::cout << "cpu usage  in handleDataReceived  = " << cpu_usage;
-    datalayout_map[client_id.toStdString()]->SetLabels( free_ram,  total_ram,  buffer_ram,  total_space,  free_space,  cpu_usage);
+    datalayout_map[client_id.toStdString()]->SetLabels( free_ram,  total_ram,  buffer_ram,  free_space,  total_space,  cpu_usage);
     std::cout << "Data received for " << client_id.toStdString() << std::endl;
     datalayout_map[client_id.toStdString()]->updateDataDeque(free_ram, free_space, cpu_usage);
     datalayout_map[client_id.toStdString()]->DrawCharts();
