@@ -62,6 +62,7 @@ class DataLayout : public QWidget {
         QLabel *free_ram_label;
         QLabel *free_ram_value;
         QLabel *total_ram_value;
+        QValueAxis *axisY_ram;
         std::vector<double> free_ram_value_history;
 
 
@@ -76,6 +77,7 @@ class DataLayout : public QWidget {
         QLabel *free_space_label;
         QLabel *free_space_value;
         QLabel *total_space_value;
+        QValueAxis *axisY_storage;
         std::vector<double> free_space_value_history;
 
         QHBoxLayout *cpu_usage_hlayout;

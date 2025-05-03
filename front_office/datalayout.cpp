@@ -17,9 +17,9 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_chart = new QChart;
     ram_chart = new QChart;
     storage_chart = new QChart;
-//    cpu_chart->legend()->setVisible(false);
-//    ram_chart->legend()->setVisible(false);
-//    storage_chart->legend()->setVisible(false);
+    cpu_chart->legend()->setVisible(false);
+    ram_chart->legend()->setVisible(false);
+    storage_chart->legend()->setVisible(false);
     free_ram_hlayout = new QHBoxLayout;
     free_ram_label = new QLabel;
     free_ram_value = new QLabel;
@@ -41,6 +41,9 @@ DataLayout::DataLayout(QWidget *parent)
     ram_chart_view = new QChartView(ram_chart);
     storage_chart_view = new QChartView(storage_chart);
 
+    //QValueAxis *axisX = new QValueAxis();
+    
+
     ip_adress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     free_ram_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     free_ram_value->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -50,19 +53,19 @@ DataLayout::DataLayout(QWidget *parent)
     free_space_hlayout->setSpacing(10);
     cpu_usage_hlayout->setSpacing(10);
     ip_adress->setText("ip adress");
-    free_ram_label->setText("free ram: ");
-    buffer_ram_label->setText("buffer ram: ");
+    free_ram_label->setText("ram usage: ");
+    //buffer_ram_label->setText("buffer ram: ");
     free_space_label->setText("free space: ");
     cpu_usage_label->setText("cpu usage: ");
     
     cpu_chart_view->setRenderHint(QPainter::Antialiasing);
-    cpu_chart_view->setFixedSize(400, 400);
+    cpu_chart_view->setFixedSize(600, 200);
 
     ram_chart_view->setRenderHint(QPainter::Antialiasing);
-    ram_chart_view->setFixedSize(400, 400);
+    ram_chart_view->setFixedSize(600, 200);
 
     storage_chart_view->setRenderHint(QPainter::Antialiasing);
-    storage_chart_view->setFixedSize(400, 400);
+    storage_chart_view->setFixedSize(600, 200);
     cpu_usage_hlayout->addWidget(cpu_usage_label);
     cpu_usage_hlayout->addWidget(cpu_usage_value);
     cpu_usage_hlayout->addWidget(cpu_chart_view);
@@ -71,10 +74,6 @@ DataLayout::DataLayout(QWidget *parent)
     free_ram_hlayout->addWidget(free_ram_value);
     free_ram_hlayout->addWidget(total_ram_value);
     free_ram_hlayout->addWidget(ram_chart_view);
-
-    // buffer_ram_hlayout->addWidget(buffer_ram_label);
-    // buffer_ram_hlayout->addWidget(buffer_ram_value);
-    // buffer_ram_hlayout->addWidget(total_ram_value2);
 
     free_space_hlayout->addWidget(free_space_label);
     free_space_hlayout->addWidget(total_space_value);
@@ -96,6 +95,30 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_chart->addSeries(&cpu_usage_series);
     storage_chart->addSeries(&free_space_series);
 
+    // Création et ajout des axes
+    QValueAxis *axisX_cpu = new QValueAxis();
+    QValueAxis *axisY_cpu = new QValueAxis();
+    axisX_cpu->setRange(0, 14);
+    axisY_cpu->setRange(0, 100);
+    cpu_chart->addAxis(axisX_cpu, Qt::AlignBottom);
+    cpu_chart->addAxis(axisY_cpu, Qt::AlignLeft);
+    cpu_usage_series.attachAxis(axisX_cpu);
+
+    QValueAxis *axisX_ram = new QValueAxis();
+    axisY_ram = new QValueAxis();
+    axisX_ram->setRange(0, 14);
+    axisY_ram->setRange(0, 100);
+    ram_chart->addAxis(axisX_ram, Qt::AlignBottom);
+    ram_chart->addAxis(axisY_ram, Qt::AlignLeft);
+    free_ram_series.attachAxis(axisX_ram);
+
+    QValueAxis *axisX_storage = new QValueAxis();
+    axisY_storage = new QValueAxis();
+    axisX_storage->setRange(0, 14);
+    axisY_storage->setRange(0, 100);
+    storage_chart->addAxis(axisX_storage, Qt::AlignBottom);
+    storage_chart->addAxis(axisY_storage, Qt::AlignLeft);
+    free_space_series.attachAxis(axisX_storage);
     std::cout << "datalayout initialized" << std::endl;
 }
 
@@ -107,7 +130,7 @@ DataLayout::~DataLayout()
 int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage){
     QString buffer_qstring;
 
-    buffer_qstring = QString::number(free_ram, 'f', 4);
+    buffer_qstring = QString::number(total_ram - free_ram, 'f', 4);
     free_ram_value->setText(buffer_qstring);
 
     buffer_qstring = QString::number(total_ram, 'f', 4);
@@ -116,7 +139,7 @@ int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, 
     buffer_qstring = QString::number(buffer_ram, 'f', 4);
     buffer_ram_value->setText(buffer_qstring);
 
-    buffer_qstring = QString::number(free_space, 'f', 4);
+    buffer_qstring = QString::number(total_space - free_space, 'f', 4);
     free_space_value->setText(buffer_qstring);
 
     buffer_qstring = QString::number(total_space, 'f', 4);
@@ -131,29 +154,34 @@ int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, 
 
 int DataLayout::DrawCharts(){
     // convert vectors to LineSeries
-    
-    for (size_t i = 0; i < free_ram_deque.size(); ++i) {
+    free_ram_series.clear();
+    free_space_series.clear();
+    cpu_usage_series.clear();
+    QString total_ram_text = total_ram_value->text();
+    QString total_space_text = total_space_value->text();
+    bool ok;
+    double total_ram = total_ram_text.toDouble(&ok);
+    double total_space = total_space_text.toDouble(&ok);
+    axisY_ram->setRange(0, total_ram);
+    axisY_storage->setRange(0, total_space);
+    for (size_t i = 0; i < cpu_usage_deque.size(); ++i) {
         double ram_x = static_cast<double>(i);
-        double ram_y = free_ram_deque[i];
+        double ram_y = (total_ram - free_ram_deque[i]) * 0.1;
 
         double space_x = static_cast<double>(i);
-        double space_y = free_space_deque[i];
+        double space_y =  (total_space - free_space_deque[i]);
 
         double cpu_x = static_cast<double>(i);
-        double cpu_y = cpu_usage_deque[i];
+        double cpu_y = cpu_usage_deque[i] * 0.01;
         
         free_ram_series.append(ram_x, ram_y);
         free_space_series.append(space_x, space_y);
         cpu_usage_series.append(cpu_x, cpu_y);
     }
 
+
     cpu_chart_view->update();
     ram_chart_view->update();
     storage_chart_view->update();
-
-//     ram_chart->addSeries(&free_ram_series);
-//     cpu_chart->addSeries(&cpu_usage_series);
-//     storage_chart->addSeries(&free_space_series);
-    //draw chart
     return 0;
 }
