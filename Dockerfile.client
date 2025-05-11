@@ -24,4 +24,5 @@ COPY . .
 RUN make client
 
 # Command to run the client application (you can customize the server IP and port here)
+CMD ["./netwatch_client"]
 # CMD ["./client", "127.0.0.1", "8080"]

@@ -10,7 +10,10 @@ void console(){
 }
 
 int main(){
-    Server server;
+    std::cout << std::unitbuf;
+    int frontendPort = std::getenv("FRONTEND_WEBSOCKET_PORT") ? std::stoi(std::getenv("FRONTEND_WEBSOCKET_PORT")) : 9002;
+    int clientPort = std::getenv("CLIENT_PORT") ? std::stoi(std::getenv("CLIENT_PORT")) : 8080;
+    Server server(frontendPort, clientPort);
     std::thread client_thread(&Server::connexionSocket, &server);
     std::thread monitoring_thread(&Server::monitoringSocket, &server);
     

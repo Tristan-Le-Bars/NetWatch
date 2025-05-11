@@ -12,11 +12,12 @@ COPY Makefile /app/
 # Définir le répertoire de travail pour la compilation
 WORKDIR /app
 
-# Compiler le serveur et le client en utilisant le Makefile
-RUN make all
-
 # Définir le port sur lequel le serveur écoute (à ajuster selon votre code)
 EXPOSE 8080
+EXPOSE 9002
+
+# Compiler le serveur et le client en utilisant le Makefile
+RUN make server
 
 # Définir la commande par défaut pour exécuter le serveur (ou client)
-CMD ["./server"]
+CMD ["./netwatch_server"]

@@ -4,20 +4,26 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile.server  # Assurez-vous que le nom est correct
+      dockerfile: Dockerfile.server 
     ports:
-      - "8080:8080"  # Redirigez le port 8080 du conteneur vers le port 8080 de votre machine
+      - "8080:8080" # client port
+      - "9002:9002" # front office port
+    environment:
+      - CLIENT_PORT=8080
+      - FRONTEND_WEBSOCKET_PORT=9002
+    env_file:
+      - server.env
+      
+  # client_one:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+  #   depends_on:
+  #     - server  # Le client dépend du serveur
 
-  client_one:
-    build:
-      context: .
-      dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
-    depends_on:
-      - server  # Le client dépend du serveur
-
-  client_two:
-    build:
-      context: .
-      dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
-    depends_on:
-      - server  # Le client dépend du serveur
+  # client_two:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+  #   depends_on:
+  #     - server  # Le client dépend du serveur

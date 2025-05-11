@@ -14,8 +14,12 @@
 #include "../include/server.h"
 #include "../include/file_tools.h"
 
-#define FRONTEND_WEBSOCKET_PORT 9002
-#define CLIENT_PORT 8080
+Server::Server(int frontend_port_, int client_port_){
+    frontend_port = frontend_port_;
+    client_port = client_port_;
+}
+
+Server::~Server(){}
 
 int Server::connexionSocket() {
     FileTools file_manager;
@@ -61,7 +65,7 @@ int Server::connexionSocket() {
     // 3. Bind du socket à une adresse et un port
     address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
     address.sin_addr.s_addr = INADDR_ANY;  // Accepte les connexions de n'importe quelle adresse réseau // sin_addr.s_addr = adresse IP
-    address.sin_port = htons(CLIENT_PORT);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
+    address.sin_port = htons(client_port);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
 
     // Lie le socket à l'adresse et au port spécifiés
     // bind associe un socket à une adresse IP et à un port local
@@ -87,7 +91,7 @@ int Server::connexionSocket() {
         exit(EXIT_FAILURE);       // Quitte le programme avec un code d'échec
     }
 
-    std::cout << "Server is listening on port " << CLIENT_PORT << std::endl;  // Message indiquant que le serveur est en écoute
+    std::cout << "Server is listening on port " << client_port << std::endl;  // Message indiquant que le serveur est en écoute
 
     // 5. Acceptation des connexions entrantes
     // accept est utiliser pour autorisé la connection entrante d'un client.
@@ -134,7 +138,7 @@ int Server::monitoringSocket(){
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(FRONTEND_WEBSOCKET_PORT);
+    address.sin_port = htons(frontend_port);
 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
         perror("Bind failed");
@@ -171,40 +175,40 @@ int Server::clientHandler(int client_socket, struct sockaddr_in client_address){
     int bytesRead;
 
     while ((bytesRead = read(client_socket, buffer, sizeof(buffer))) > 0) {
-            std::string command(buffer, bytesRead);
-            if (command == "send_resources") {
-                // Read the incoming machine resources data
-                bytesRead = read(client_socket, buffer, 1024);  // Read the data into the buffer
-                std::string resourcesData(buffer, bytesRead);
+        std::string command(buffer, bytesRead);
+        if (command == "send_resources") {
+            // Read the incoming machine resources data
+            bytesRead = read(client_socket, buffer, 1024);  // Read the data into the buffer
+            std::string resourcesData(buffer, bytesRead);
 
-                // Display the received data or process it as needed
-                std::cout << "Received machine resources data from client:" << std::endl;
-                std::cout << resourcesData << std::endl;
+            // Display the received data or process it as needed
+            std::cout << "Received machine resources data from client:" << std::endl;
+            std::cout << resourcesData << std::endl;
+            
+            // Optionally, send a response back to the client
+            std::string response = "Machine resources data received";
+            send(client_socket, response.c_str(), response.size(), 0);
+
+            // ICI format le json pour tout envoyer d'un coup ?
+
+            // Send data to the admin front-end
+            // std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
+            std::cout << 'list of frontend sockets:' << std::endl;
+            for (int frontend_socket : admin_sockets){
+                std::cout << "  - "<< frontend_socket << std::endl;
+            }
+            for (int frontend_socket : admin_sockets) {
+                std::cout << "try to send data to the front-end " << frontend_socket << std::endl;
                 
-                // Optionally, send a response back to the client
-                std::string response = "Machine resources data received";
-                send(client_socket, response.c_str(), response.size(), 0);
-
-                // ICI format le json pour tout envoyer d'un coup ?
-
-                // Send data to the admin front-end
-                // std::lock_guard<std::mutex> lock(client_mutex);  // Protège l'accès à frontend_clients
-                std::cout << 'list of frontend sockets:' << std::endl;
-                for (int frontend_socket : admin_sockets){
-                    std::cout << "  - "<< frontend_socket << std::endl;
-                }
-                for (int frontend_socket : admin_sockets) {
-                    std::cout << "try to send data to the front-end " << frontend_socket << std::endl;
-                    
-                    std::cout << "data sent :" << std::endl << resourcesData.c_str() << std::endl;
-                    int send_result = send(frontend_socket, resourcesData.c_str(), resourcesData.size(), 0);
-                    std::cout << "send result = " << send_result << std::endl;
-                    if (send_result < 0) {
-                        std::cout << "Erreur d'envoi des données au client front-end" << std::endl;
-                    }
+                std::cout << "data sent :" << std::endl << resourcesData.c_str() << std::endl;
+                int send_result = send(frontend_socket, resourcesData.c_str(), resourcesData.size(), 0);
+                std::cout << "send result = " << send_result << std::endl;
+                if (send_result < 0) {
+                    std::cout << "Erreur d'envoi des données au client front-end" << std::endl;
                 }
             }
         }
+    }
     std::cout << "Client disconnected: " << client_ip << std::endl;
     close(client_socket);
     return 0;
