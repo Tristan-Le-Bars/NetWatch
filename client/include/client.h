@@ -25,7 +25,7 @@ class Client{
         std::mutex socketMutex;
         
     public:
-        Client();
+        Client(std::string inputIP, std::string inputPort);
         ~Client();
 
         void setId();

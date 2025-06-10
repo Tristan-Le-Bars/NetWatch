@@ -11,32 +11,28 @@
 #include <random>
 #include <iomanip>
 
-
 #include "../include/file_tools.h"
 #include "../include/client.h"
 #include "../include/machine_resources.h"
 
-
-#define PORT 8080
-
-Client::Client(){
+Client::Client(std::string inputIP, std::string inputPort){
     setId();
     machine_resources = std::make_shared<MachineResources>(id);
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("Client socket creation failed");  // Affiche un message d'erreur en cas d'échec de la création du socket
-        exit(EXIT_FAILURE);       // Quitte le programme avec un code d'échec
+        perror("Client socket creation failed");
+        exit(EXIT_FAILURE);
     }
     else{
         std::cout << "Client socket creation successfull" << std::endl;
     }
 
     server_address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
-    server_address.sin_port = htons(PORT);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
+    server_address.sin_port = htons(std::atoi(std::getenv("PORT")));        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
     //inet_pton converti une adresse ip au format binaire
     //AF_INET -> ipv4
     // adresse ip !changer pour pouvoir la rentrer manuellement;
     // adresse vers le sockaddr_in qui stockeras l'adresse en format binaire
-    if (inet_pton(AF_INET, "0.0.0.0", &server_address.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, inputIP.c_str(), &server_address.sin_addr) <= 0) {
         std::cout << "Invalid address/ Address not supported" << std::endl;
         // return -1;
     }

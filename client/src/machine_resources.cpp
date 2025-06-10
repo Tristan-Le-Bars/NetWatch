@@ -108,7 +108,7 @@ void MachineResources::getCPUUsage() {
 
 
             total1 = total2;
-            total_idle = idle2; // Mettre à jour total_idle avec la nouvelle valeur
+            total_idle = idle2;
         } else {
             std::cerr << "Failed to read CPU stats from /proc/stat" << std::endl;
             fclose(proc_stat);
