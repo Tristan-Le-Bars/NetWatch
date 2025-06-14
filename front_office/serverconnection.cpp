@@ -4,10 +4,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <algorithm>
-
 #include "mainwindow.h"
 
-#define PORT 9002
 
 ServerConnection::ServerConnection(std::string address_text_){
     address_text = address_text_;
@@ -23,7 +21,7 @@ int ServerConnection::EstablishConnection(){
     }
 
     server_address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
-    server_address.sin_port = htons(PORT);
+    server_address.sin_port = htons(9002);
 
     // convertie l'addresse au format binaire
     if (inet_pton(AF_INET, address_text.c_str(), &server_address.sin_addr) <= 0) {

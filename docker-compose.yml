@@ -18,6 +18,9 @@ services:
   #   build:
   #     context: .
   #     dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+  #   environment:
+  #     - PORT=8080
+  #     - IP_ADDRESS=0.0.0.0
   #   depends_on:
   #     - server  # Le client dépend du serveur
 
@@ -25,5 +28,8 @@ services:
   #   build:
   #     context: .
   #     dockerfile: Dockerfile.client  # Vous pouvez créer un autre Dockerfile pour le client si nécessaire
+  #   environment:
+  #     - PORT=8080
+  #     - IP_ADDRESS=0.0.0.0
   #   depends_on:
   #     - server  # Le client dépend du serveur
