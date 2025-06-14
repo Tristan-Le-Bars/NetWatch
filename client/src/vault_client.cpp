@@ -47,8 +47,7 @@ int main(){
             std::cout << "Port invalide. Réessayez.\n";
         }
     }
-
-
+    
     Client client(inputIP, inputPort);
     return 0;
 }

@@ -81,6 +81,15 @@ int Server::connexionSocket() {
         std::cout << "socket/addresse binding successfull" << std::endl;
     }
 
+    socklen_t len = sizeof(address);
+    if (getsockname(server_fd, (struct sockaddr*)&address, &len) == 0) {
+        char ip_str[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &address.sin_addr, ip_str, sizeof(ip_str));
+        std::cout << "Server IP: " << ip_str << std::endl;
+    } else {
+        perror("getsockname failed");
+    }
+
     // 4. Mise en écoute du socket
     // listen prépare le socket à accepter les connexions entrantes
     // server_fd = file descriptor du socket à mettre en écoute

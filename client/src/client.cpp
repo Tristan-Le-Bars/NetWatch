@@ -27,7 +27,7 @@ Client::Client(std::string inputIP, std::string inputPort){
     }
 
     server_address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
-    server_address.sin_port = htons(std::atoi(std::getenv("PORT")));        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
+    server_address.sin_port = htons(std::atoi(inputPort.c_str()));        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
     //inet_pton converti une adresse ip au format binaire
     //AF_INET -> ipv4
     // adresse ip !changer pour pouvoir la rentrer manuellement;
