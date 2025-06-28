@@ -7,9 +7,12 @@ DataLayout::DataLayout(QWidget *parent)
     : QWidget(parent)
 
 {
+    std::cout << "test1" << std::endl;
     main_hlayout = new QHBoxLayout;
 
-    ip_adress = new QLabel;
+    client_id_layout = new QHBoxLayout;
+    client_id_label = new QLabel;
+    client_id_value = new QLabel;
 
     //data_widget = new QWidget;
     data_vlayout = new QVBoxLayout;
@@ -40,11 +43,12 @@ DataLayout::DataLayout(QWidget *parent)
     cpu_chart_view = new QChartView(cpu_chart);
     ram_chart_view = new QChartView(ram_chart);
     storage_chart_view = new QChartView(storage_chart);
+    std::cout << "test2" << std::endl;
 
     //QValueAxis *axisX = new QValueAxis();
     
 
-    ip_adress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    client_id_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     free_ram_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     free_ram_value->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     total_ram_value->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -52,11 +56,12 @@ DataLayout::DataLayout(QWidget *parent)
     buffer_ram_hlayout->setSpacing(10);
     free_space_hlayout->setSpacing(10);
     cpu_usage_hlayout->setSpacing(10);
-    ip_adress->setText("ip adress");
+    client_id_label->setText("ID : ");
     free_ram_label->setText("ram usage: ");
     //buffer_ram_label->setText("buffer ram: ");
     free_space_label->setText("free space: ");
     cpu_usage_label->setText("cpu usage: ");
+    std::cout << "test3" << std::endl;
     
     cpu_chart_view->setRenderHint(QPainter::Antialiasing);
     cpu_chart_view->setFixedSize(600, 200);
@@ -66,6 +71,13 @@ DataLayout::DataLayout(QWidget *parent)
 
     storage_chart_view->setRenderHint(QPainter::Antialiasing);
     storage_chart_view->setFixedSize(600, 200);
+
+    std::cout << "test4" << std::endl;
+    client_id_layout->addWidget(client_id_label);
+    client_id_layout->addWidget(client_id_value);
+    std::cout << "test5" << std::endl;
+
+
     cpu_usage_hlayout->addWidget(cpu_usage_label);
     cpu_usage_hlayout->addWidget(cpu_usage_value);
     cpu_usage_hlayout->addWidget(cpu_chart_view);
@@ -82,7 +94,7 @@ DataLayout::DataLayout(QWidget *parent)
 
     data_vlayout->setSpacing(10);
     data_vlayout->setContentsMargins(0, 0, 0, 0);
-    data_vlayout->addWidget(ip_adress);
+    data_vlayout->addLayout(client_id_layout);
     data_vlayout->addLayout(cpu_usage_hlayout);
     data_vlayout->addLayout(free_ram_hlayout);
     data_vlayout->addLayout(free_space_hlayout);
@@ -94,7 +106,7 @@ DataLayout::DataLayout(QWidget *parent)
     ram_chart->addSeries(&free_ram_series);
     cpu_chart->addSeries(&cpu_usage_series);
     storage_chart->addSeries(&free_space_series);
-
+    
     // Création et ajout des axes
     QValueAxis *axisX_cpu = new QValueAxis();
     QValueAxis *axisY_cpu = new QValueAxis();
@@ -131,8 +143,10 @@ DataLayout::~DataLayout()
 
 }
 
-int DataLayout::SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage){
+int DataLayout::SetLabels(QString client_id, double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage){
     QString buffer_qstring;
+
+    client_id_value->setText(client_id);
 
     buffer_qstring = QString::number(total_ram - free_ram, 'f', 4);
     free_ram_value->setText(buffer_qstring);

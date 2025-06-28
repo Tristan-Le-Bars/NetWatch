@@ -18,7 +18,7 @@ class DataLayout : public QWidget {
         ~DataLayout();
         int DrawCharts();
 
-        int SetLabels(double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage);
+        int SetLabels(QString client_id, double free_ram, double total_ram, double buffer_ram, double free_space, double total_space, double cpu_usage);
 
         QHBoxLayout *main_hlayout;
         
@@ -41,7 +41,9 @@ class DataLayout : public QWidget {
         std::deque<double> cpu_usage_deque;
 
 
-        QLabel *ip_adress;
+        QLabel *client_id_label;
+        QLabel *client_id_value;
+        QHBoxLayout *client_id_layout;
 
         QVBoxLayout *data_vlayout;
         QVBoxLayout *charts_vlayout;

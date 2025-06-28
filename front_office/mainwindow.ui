@@ -33,22 +33,6 @@
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="test_button">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>20</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: #F9F9F9;</string>
-    </property>
-    <property name="text">
-     <string>test</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>

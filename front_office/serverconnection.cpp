@@ -57,6 +57,7 @@ int ServerConnection::ReadFromServer(){
 
         datatype = extractString(resourcesData, "\"datatype\": ");
         client_id = extractString(resourcesData, "\"client_id\": ");
+        std::cout << "test" << std::endl;
         total_ram = extractDouble(resourcesData, "\"total_ram\": ");
         free_ram = extractDouble(resourcesData, "\"free_ram\": ");
         buffer_ram = extractDouble(resourcesData, "\"buffer_ram\": ");
