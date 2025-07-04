@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("NetWatch");
 
     ui->scrollArea->setWidget(ui->scrollAreaWidgetContents);
     ui->scrollArea->setWidgetResizable(true);
