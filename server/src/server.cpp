@@ -45,7 +45,7 @@ int Server::connexionSocket() {
         std::cout << "socket creation successfull" << std::endl;
     }
 
-    // 2. Configuration des options de socket
+    // Configuration des options de socket
     // Permet de réutiliser l'adresse et le port pour éviter les erreurs "address already in use"
     // le mot clé setsockopt permet de définir des option sur un socket.
     // server_fd = file descriptor sur lequel les options doivent être configurer.
@@ -61,7 +61,7 @@ int Server::connexionSocket() {
         std::cout << "socket option setting successfull" << std::endl;
     }
 
-    // 3. Bind du socket à une adresse et un port
+    // Bind du socket à une adresse et un port
     address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
     address.sin_addr.s_addr = INADDR_ANY;  // Accepte les connexions de n'importe quelle adresse réseau // sin_addr.s_addr = adresse IP
     address.sin_port = htons(client_port);        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
