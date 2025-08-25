@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mainLayout->addWidget(ui->scrollArea);
     ui->scrollAreaWidgetContents->setLayout(ui->servers_layout);
 
-    //connect(ui->test_button, &QPushButton::clicked, this, &MainWindow::AddDataLayer);
     connect(ui->connectButton, &QPushButton::clicked, this, &MainWindow::ConnectToServer);
 }
 
@@ -40,13 +39,10 @@ int MainWindow::ConnectToServer(){
     connection_threads_map[address_text] = serverThread;
 
     conn->EstablishConnection();
-
-    // Déplacer le ServerConnection dans un thread séparé
     
     std::cout << "read from server connection: " << connect(serverThread, &QThread::started, connections_map[address_text], &ServerConnection::ReadFromServer) << std::endl;
     std::cout << "add data layer connection: " << connect(connections_map[address_text], &ServerConnection::addDataLayerRequested, this, &MainWindow::AddDataLayer, Qt::QueuedConnection) << std::endl;
     std::cout << "handle data recieved connection: " << connect(connections_map[address_text], &ServerConnection::dataReceived, this, &MainWindow::handleDataReceived, Qt::QueuedConnection) << std::endl;
-    //connect(conn, &ServerConnection::finished, serverThread, &QThread::quit);
     std::cout << "delete later connection: " << connect(serverThread, &QThread::finished, serverThread, &QThread::deleteLater) << std::endl;
     
     connections_map[address_text]->moveToThread(serverThread);
@@ -56,7 +52,6 @@ int MainWindow::ConnectToServer(){
 }
 
 int MainWindow::GetClients(){
-    // create the widgets displaying the informations from the clients
     return 0;
 }
 
