@@ -2,7 +2,6 @@
 #include <fstream>
 #include <filesystem>
 
-// Fonction pour écrire un fichier en binaire
 void FileTools::writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
     std::ofstream file(filename, std::ios::binary);
     file.write(reinterpret_cast<const char*>(data.data()), data.size());
@@ -17,7 +16,6 @@ std::vector<unsigned char> FileTools::readFile(const std::string& filename) {
     return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 
-// Fonction pour obtenir la liste des fichiers dans un répertoire donné
 std::string FileTools::listFilesInDirectory(const std::string& directory) {
     std::string fileList;
     for (const auto& entry : std::filesystem::directory_iterator(directory)) {
