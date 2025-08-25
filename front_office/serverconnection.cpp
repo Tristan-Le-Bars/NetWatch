@@ -13,14 +13,14 @@ ServerConnection::ServerConnection(std::string address_text_){
 
 int ServerConnection::EstablishConnection(){
     if ((front_office_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("Client socket creation failed");  // Affiche un message d'erreur en cas d'échec de la création du socket
-        exit(EXIT_FAILURE);       // Quitte le programme avec un code d'échec
+        perror("Client socket creation failed");
+        exit(EXIT_FAILURE);
     }
     else{
         qDebug() << "Client socket creation successfull";
     }
 
-    server_address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
+    server_address.sin_family = AF_INET; // Utilisation du protocole IPv4 // sin_family = famille d'adresse
     server_address.sin_port = htons(9002);
 
     // convertie l'addresse au format binaire
@@ -103,9 +103,6 @@ int ServerConnection::ReadFromServer(){
     return 0;
 }
 
-
-
-// Fonction pour extraire une valeur de type double entre guillemets
 double ServerConnection::extractDouble(const std::string& json, const std::string& key) {
     std::size_t pos = json.find(key);
     if (pos == std::string::npos) {
@@ -120,7 +117,6 @@ double ServerConnection::extractDouble(const std::string& json, const std::strin
     return extracted_double;
 }
 
-// Fonction pour extraire une valeur de type string entre guillemets
 std::string ServerConnection::extractString(const std::string& json, const std::string& key) {
     std::size_t pos = json.find(key);
     if (pos == std::string::npos) {
