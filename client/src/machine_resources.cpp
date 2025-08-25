@@ -10,12 +10,8 @@
 MachineResources::MachineResources(std::string id)
 : client_id(id), user(0), nice(0), system(0), idle(0), iowait(0), irq(0), softirq(0),
 total1(0), total2(0), total_idle(0), cpu_usage(0.0) {
-    // std::lock_guard<std::mutex> lock(resourceMutex);
-    // Open /proc/stat
-    // setId();
     client_id = id;
     setProcStat();
-    // Read the first line (cpu stats)
     fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
             &user, &nice, &system, &idle, &iowait, &irq, &softirq);
     fclose(proc_stat);
@@ -31,11 +27,9 @@ MachineResources::~MachineResources(){
 
 
 void MachineResources::updateResourcesInfo(){
-    std::lock_guard<std::mutex> lock(resourceMutex);// good
+    std::lock_guard<std::mutex> lock(resourceMutex);
     setSysinfo();
     setStatvfs();
-    // setProcStat();
-    // fclose(proc_stat);
 }
 
 
@@ -78,17 +72,13 @@ void MachineResources::getStorageUsage(){
 
 void MachineResources::getRAMUsage(){
     std::lock_guard<std::mutex> lock(resourceMutex);
-    // Calculate and display RAM data in megabytes
     total_ram_mb = info.totalram / (1024.0 * 1024.0 * 1024.0); // Convert bytes to MB
     free_ram_mb = info.freeram / (1024.0 * 1024.0 * 1024.0);   // Convert bytes to MB
     buffer_ram_mb = info.bufferram / (1024.0 * 1024.0 * 1024.0); // Convert bytes to MB
-    // cached_ram_mb = info.cachedram / (1024 * 1024); // Convert bytes to MB
 }
 
 void MachineResources::getCPUUsage() {
     std::lock_guard<std::mutex> lock(resourceMutex);
-
-    // Read the stats again
     setProcStat();
     if (proc_stat) {
         if (fscanf(proc_stat, "cpu %llu %llu %llu %llu %llu %llu %llu",
@@ -143,7 +133,6 @@ std::string MachineResources::getFormattedData(){
                     "       \"cpu_usage\": " + cpu_usage_str + ",\n" +
                     "   }\n"
                     "}";
-    // std::cout << formated_data << std::endl;
     return formated_data;
 }
 
