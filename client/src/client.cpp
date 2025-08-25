@@ -26,8 +26,8 @@ Client::Client(std::string inputIP, std::string inputPort){
         std::cout << "Client socket creation successfull" << std::endl;
     }
 
-    server_address.sin_family = AF_INET;          // Utilisation du protocole IPv4 // sin_family = famille d'adresse
-    server_address.sin_port = htons(std::atoi(inputPort.c_str()));        // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
+    server_address.sin_family = AF_INET; // Utilisation du protocole IPv4 // sin_family = famille d'adresse
+    server_address.sin_port = htons(std::atoi(inputPort.c_str())); // Conversion du numéro de port en format réseau // sin_port = numéro de port // htons converti l'ordre des octets d'un entier vers l'ordre d'octet du réseau
     //inet_pton converti une adresse ip au format binaire
     //AF_INET -> ipv4
     // adresse ip !changer pour pouvoir la rentrer manuellement;
@@ -55,14 +55,10 @@ Client::Client(std::string inputIP, std::string inputPort){
 
     monitoring_thread.join();
     commands_thread.join();
-    // monitoring_thread.detach();
-    // commands_thread.detach();
-
-    // close(client_socket);  // Ferme le socket du serveur
 }
 
 Client::~Client(){
-    close(client_socket);  // Ferme le socket du serveur
+    close(client_socket);
 }
 
 void Client::monitorResources() {
@@ -74,24 +70,21 @@ void Client::monitorResources() {
             machine_resources->getRAMUsage();
             machine_resources->getStorageUsage();
             machine_resources->getCPUUsage();
-            // send(client_socket, "send_resources", strlen("send_resources"), 0);
             sendMachineResources();
             
-            std::this_thread::sleep_for(std::chrono::seconds(1));  // Wait for 2 seconds before updating again
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
     catch (const std::exception& e) {
         std::cerr << "Exception in monitorResources: " << e.what() << std::endl;
     }
-
 }
 
 void Client::commandsHandler() {
     std::cout << "entering commands handler" << std::endl;
-    
     while (true) {
         std::string command;
-        std::cout << "$> "; //FIX HERE
+        std::cout << "$> ";
         std::cin >> command;
         send(client_socket, command.c_str(), strlen(command.c_str()), 0);
         
@@ -106,12 +99,8 @@ void Client::commandsHandler() {
 
 void Client::sendMachineResources(){
     std::string resourcesData = machine_resources->getFormattedData();
-    
-    // Send the "send_resources" command firsts
     std::string command = "send_resources";
     send(client_socket, command.c_str(), command.size(), 0);
-    
-    // Send the formatted resources data
     send(client_socket, resourcesData.c_str(), resourcesData.size(), 0);
 }
 
@@ -126,10 +115,10 @@ void Client::setId() {
     for (int i = 0; i < 8; i++) ss << std::setw(1) << dis(gen);
     ss << "-";
     for (int i = 0; i < 4; i++) ss << std::setw(1) << dis(gen);
-    ss << "-4"; // version 4
+    ss << "-4";
     for (int i = 0; i < 3; i++) ss << std::setw(1) << dis(gen);
     ss << "-";
-    ss << std::setw(1) << ((dis(gen) & 0x3) | 0x8); // version variant bits
+    ss << std::setw(1) << ((dis(gen) & 0x3) | 0x8);
     for (int i = 0; i < 3; i++) ss << std::setw(1) << dis(gen);
     ss << "-";
     for (int i = 0; i < 12; i++) ss << std::setw(1) << dis(gen);
